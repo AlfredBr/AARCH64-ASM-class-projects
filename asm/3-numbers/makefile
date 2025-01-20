@@ -19,5 +19,8 @@ clean:
 run: $(TARGET)
 	./$(TARGET)
 
+debug: $(TARGET)
+	gdb -tui -q ./$(TARGET)
+
 disasm:
 	objdump -d $(TARGET) > $(TARGET).disasm

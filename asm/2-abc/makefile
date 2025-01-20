@@ -13,5 +13,11 @@ $(TARGET): $(TARGET).o
 clean:
 	rm -f $(TARGET) a.out *.o *.disasm
 
+run: $(TARGET)
+	./$(TARGET)
+
+debug: $(TARGET)
+	gdb -tui -q ./$(TARGET)
+
 disasm:
 	objdump -d $(TARGET) > $(TARGET).disasm

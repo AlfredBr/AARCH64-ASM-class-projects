@@ -1,8 +1,5 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -O2
 ASM = as
 LD = ld
-
 TARGET = hello
 
 all: $(TARGET)
@@ -10,11 +7,17 @@ all: $(TARGET)
 %.o : %.s
 	$(ASM) -g -o $@ $<
 
-hello: hello.o
-	$(LD) -g -o hello hello.o
+$(TARGET): $(TARGET).o
+	$(LD) -g -o $@ $<
 
 clean:
-	rm -f $(TARGET) a.out *.o *.disasm hello
+	rm -f $(TARGET) a.out *.o *.disasm
+
+run: $(TARGET)
+	./$(TARGET)
+
+debug: $(TARGET)
+	gdb -tui -q ./$(TARGET)
 
 disasm:
 	objdump -d $(TARGET) > $(TARGET).disasm

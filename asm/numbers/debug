@@ -1,0 +1,4 @@
+make clean
+make
+gdb -tui numbers
+echo $?

@@ -8,5 +8,5 @@ int main() {
 		printf("Number %d\n", i);
 	}
 
-	return i;
+	return 0;
 }

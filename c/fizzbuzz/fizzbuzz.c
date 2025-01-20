@@ -8,9 +8,10 @@ char * f(int x, char *s)
 
 int main()
 {
-    for (int x = 0; x < 32; x++)
+	const int MAX = 32;
+    for (int x = 0; x < MAX; x++)
     {
         printf("%d %s%s\n", x, f(x % 3, "Fizz"), f(x % 5, "Buzz"));
     }
-    exit(0);
+    return 0;
 }

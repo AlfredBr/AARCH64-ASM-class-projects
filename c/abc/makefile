@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -g
-TARGET = hello
+TARGET = abc
 
 $(TARGET): $(TARGET).c
 	$(CC) $(CFLAGS) -o $@ $<

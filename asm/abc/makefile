@@ -1,11 +1,8 @@
 ASM = as
 LD = ld
-TARGET = afizzbuzz
+TARGET = abc
 
 all: $(TARGET)
-
-run: $(TARGET)
-	./$(TARGET)
 
 %.o : %.s
 	$(ASM) -g -o $@ $<

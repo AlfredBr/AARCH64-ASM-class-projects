@@ -7,3 +7,9 @@ $(TARGET): $(TARGET).c
 
 clean:
 	rm -f $(TARGET) a.out
+
+run: $(TARGET)
+	./$(TARGET)
+
+debug: $(TARGET)
+	gdb -tui -q ./$(TARGET)

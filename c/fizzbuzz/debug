@@ -1,4 +1,0 @@
-make clean
-make
-gdb -tui fizzbuzz
-echo $?

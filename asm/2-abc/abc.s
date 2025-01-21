@@ -7,6 +7,17 @@
 .global _start
 .balign 4
 
+// Define the prologue macro
+.macro prologue
+    stp x29, x30, [sp, #-16]!    // Save x29 and x30
+    mov x29, sp                  // Set frame pointer
+.endm
+
+// Define the epilogue macro
+.macro epilogue
+    ldp x29, x30, [sp], #16      // Restore x29 and x30
+.endm
+
 _start:
 	ldr x6, =buffer   // Load the address of buffer into x6
 	mov w0, #65       // Move ASCII code for 'A' to w0
@@ -36,13 +47,12 @@ _exit:
 // x1 = address of the string to print
 // x2 = length of the string
 print_string:
-    stp x29, x30, [sp, #-16]!         // >> Prologue: save x29 and x30 on the stack
-    mov x29, sp
-    mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
-    mov x8, #64                       // Set x8 to 64 (sys_write syscall number)
-    svc 0                             // Make the syscall
-    ldp x29, x30, [sp], #16           // << Epilogue: restore x29 and x30
-    ret                               // Return from function
+    prologue          // Replace existing prologue
+    mov x0, #1        // Set x0 to 1 (file descriptor for stdout)
+    mov x8, #64       // Set x8 to 64 (sys_write syscall number)
+    svc 0             // Make the syscall
+    epilogue          // Replace existing epilogue
+	ret
 
 _end:
 

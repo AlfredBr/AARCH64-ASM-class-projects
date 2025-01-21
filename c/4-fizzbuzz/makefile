@@ -4,9 +4,6 @@ TARGET = fizzbuzz
 
 all: $(TARGET)
 
-run: $(TARGET)
-	./$(TARGET)
-
 $(TARGET): $(TARGET).c
 	$(CC) $(CFLAGS) -o $@ $<
 

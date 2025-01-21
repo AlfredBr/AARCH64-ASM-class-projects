@@ -1,3 +1,0 @@
-make fizzbuzz
-./fizzbuzz
-echo "exit "$?

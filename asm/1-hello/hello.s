@@ -2,7 +2,6 @@
 .global _start                        // Define the entry point
 
 _start:
-    mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
     ldr x1, =msg                      // Load the address of msg into x1
     bl print_string                   // Call print_string
 
@@ -16,6 +15,7 @@ print_string:
     mov x29, sp
     bl strlen                         // Call strlen to get the length of string pointed to by x1
                                       // strlen side-effect => length stored in x2
+    mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
     mov x8, #64                       // Set x8 to 64 (sys_write syscall number)
     svc 0                             // Make the syscall
     ldp x29, x30, [sp], #16           // << Epilogue: restore x29 and x30

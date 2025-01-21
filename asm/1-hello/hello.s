@@ -1,6 +1,17 @@
 .section .text                        // Text section for code
 .global _start                        // Define the entry point
 
+// Define the prologue macro
+.macro prologue
+    stp x29, x30, [sp, #-16]!    // Save x29 and x30 on the stack
+    mov x29, sp                  // Set frame pointer
+.endm
+
+// Define the epilogue macro
+.macro epilogue
+    ldp x29, x30, [sp], #16      // Restore x29 and x30
+.endm
+
 _start:
     ldr x1, =msg                      // Load the address of msg into x1
     bl print_string                   // Call print_string
@@ -11,18 +22,18 @@ _exit:
     svc 0                             // Make the syscall
 
 print_string:
-    stp x29, x30, [sp, #-16]!         // >> Prologue: save x29 and x30 on the stack
+    prologue
     mov x29, sp
     bl strlen                         // Call strlen to get the length of string pointed to by x1
                                       // strlen side-effect => length stored in x2
     mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
     mov x8, #64                       // Set x8 to 64 (sys_write syscall number)
     svc 0                             // Make the syscall
-    ldp x29, x30, [sp], #16           // << Epilogue: restore x29 and x30
+    epilogue
     ret                               // Return from function
 
 strlen:
-    stp x29, x30, [sp, #-16]!         // >> Prologue: save x29 and x30 on the stack
+    prologue
     mov x29, sp
     mov x6, #0                        // Initialize x6 to 0
 strlen_loop:
@@ -33,7 +44,7 @@ strlen_loop:
     b strlen_loop                     // we're not done, go back to top of loop
 strlen_end:
     mov x2, x6                        // Move the length from x6 to x2
-    ldp x29, x30, [sp], #16           // << Epilogue: restore x29 and x30
+    epilogue
     ret                               // Return from function
 
 _end:

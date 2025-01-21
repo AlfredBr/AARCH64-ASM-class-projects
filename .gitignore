@@ -2,3 +2,5 @@ c/numbers/numbers
 asm/2-abc/abc
 asm/2-abc/abc.o
 //*.o
+asm/1-hello/hello.o
+asm/1-hello/hello

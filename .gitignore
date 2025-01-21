@@ -7,3 +7,5 @@ asm/1-hello/hello
 asm/2-abc/abc.o
 asm/2-abc/abc
 c/4-fizzbuzz/fizzbuzz
+asm/3-numbers/numbers.o
+asm/3-numbers/numbers

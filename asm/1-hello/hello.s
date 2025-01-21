@@ -23,7 +23,6 @@ _exit:
 
 print_string:
     prologue
-    mov x29, sp
     bl strlen                         // Call strlen to get the length of string pointed to by x1
                                       // strlen side-effect => length stored in x2
     mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
@@ -34,7 +33,6 @@ print_string:
 
 strlen:
     prologue
-    mov x29, sp
     mov x6, #0                        // Initialize x6 to 0
 strlen_loop:
     ldrb w4, [x1, x6]                 // Load the byte at the address x1 + x6 into w4

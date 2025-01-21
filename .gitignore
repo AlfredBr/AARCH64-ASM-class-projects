@@ -4,3 +4,6 @@ asm/2-abc/abc.o
 //*.o
 asm/1-hello/hello.o
 asm/1-hello/hello
+asm/2-abc/abc.o
+asm/2-abc/abc
+c/4-fizzbuzz/fizzbuzz

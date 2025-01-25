@@ -93,8 +93,8 @@ strlen_done:
 _end:
 
 .section .data                        // Data section for storing constants
-    msg:    .ascii "Numbers\n"        // Define the message string
-            .byte 0                   // Null terminator
+    msg:  	.ascii "Numbers\n"        // Define the message string
+          	.byte 0                   // Null terminator
 
 .section .bss
     .align 3                          // Align to 8-byte boundary

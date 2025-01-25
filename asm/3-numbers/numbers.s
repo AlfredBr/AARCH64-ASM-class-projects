@@ -38,6 +38,21 @@ itoa_loop:
     add  x3, x3, #1                  // Increment digit count
     mov  x10, x4                     // Update x10 with the quotient
     cbnz x10, itoa_loop              // Continue if quotient is not zero
+reverse:
+    mov x12, x11                     // Start pointer
+    add x13, x11, x3                 // End pointer
+    sub x13, x13, #1                 // Adjust end pointer to the last byte
+reverse_loop:
+    cmp x12, x13                     // Compare start and end pointers
+    b.ge reverse_done                // If start >= end, we're done
+    ldrb w14, [x12]                  // Load byte from start pointer
+    ldrb w15, [x13]                  // Load byte from end pointer
+    strb w15, [x12]                  // Store byte from end to start
+    strb w14, [x13]                  // Store byte from start to end
+    add x12, x12, #1                 // Move start pointer forward
+    sub x13, x13, #1                 // Move end pointer backward
+    b reverse_loop                   // Repeat the loop
+reverse_done:
     mov  x5, NEWLINE				 // Load newline character
     strb w5, [x1]                    // Store the newline
 	add  x1, x1, #1                  // Increment the buffer pointer
@@ -46,7 +61,6 @@ itoa_loop:
 	mov  x1, x11					 // Restore the buffer address from x11 to x1
 	epilogue
     ret
-
 
 print_string:
     prologue

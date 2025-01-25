@@ -5,8 +5,8 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
-    ldr x1, =msg                    // Load the address of msg into x1
-    bl print_string                 // Call print_string
+    ldr x1, =msg                      // Load the address of msg into x1
+    bl print_string                   // Call print_string
 init:
 	mov x20, #0
 counter:

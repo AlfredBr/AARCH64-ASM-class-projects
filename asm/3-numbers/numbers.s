@@ -5,10 +5,10 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
-    //ldr x1, =msg                      // Load the address of msg into x1
-    //bl print_string                   // Call print_string
+    //ldr x1, =msg                    // Load the address of msg into x1
+    //bl print_string                 // Call print_string
 
-    ldr x0, =1234567890                      // Load the integer 1234567890 into x0
+    ldr x0, =1234567890               // Load the integer 1234567890 into x0
     ldr x1, =buffer                   // Load the address of buffer into x1
     bl itoa                           // Convert the integer to ASCII
     bl print_string                   // Call print_string

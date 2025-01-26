@@ -8,6 +8,10 @@ char *fn(int x, char *s)
 
 int main()
 {
+	main2();
+}
+int main1()
+{
 	const int MAX = 100;
 	for (int x = 0; x < MAX; x++)
 	{
@@ -21,4 +25,32 @@ int main()
 		printf("\n");
 	}
 	return 0;
+}
+
+int main2()
+{
+	const int MAX = 100;
+	for (int x = 0; x < MAX; x++)
+	{
+		int b = 0;
+		int n = x / 3;
+		int m = n * 3;
+		if ((x - m) == 0)
+		{
+			printf("Fizz");
+			b++;
+		}
+		n = x / 5;
+		m = n * 5;
+		if ((x - m) == 0)
+		{
+			printf("Buzz");
+			b++;
+		}
+		if (b == 0)
+		{
+			printf("%d", x);
+		}
+		printf("\n");
+	}
 }

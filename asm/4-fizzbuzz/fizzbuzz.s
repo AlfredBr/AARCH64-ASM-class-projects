@@ -1,178 +1,129 @@
-// Data section for storing constants and buffers
-.section .data
-	hello:	   	 .ascii "Hello, World!\n"  // Define the string "Hello, World!"
-				 .byte 0x00				   // Null terminator
-	hello_len =	 . - hello - 1     		   // Calculate length of the string "Hello, World!"
-    fizz_str:    .ascii "Fizz"  // Define the string "Fizz"
-    fizz_len:    .word 4        // Length of the string "Fizz"
-    buzz_str:    .ascii "Buzz"  // Define the string "Buzz"
-    buzz_len:    .word 4        // Length of the string "Buzz"
-    newline:     .ascii "\n"    // Define the newline character
-    newline_len: .word 1        // Length of the newline character
-    number_buffer: .space 12    // Allocate 12 bytes for number string buffer
+.global _start                        // Define the entry point
+.align 2                              // Align to 8-byte boundary
 
-// Text section for code
-.section .text
-.global _start                  // Define the entry point
+.section .text                        // Text section for code
+.include "macros.s"                   // Include the macros file
 
 _start:
-    mov x0, #0                  // Initialize counter to 0
+    mov  x20, #0                      // Initialize x20 to 0
+counter:
+    mov  x21, #0                      // Initialize x21 to 0
+    ldr  x1, =buffer                  // Load the address of buffer into x1
+fizz_check:
+    mov  x23, #3                      // Load #3 into x23
+    mov  x0, x20                      // Copy the number from x20 to x0
+    udiv x2, x0, x23                  // Divide x0 by #3
+    mul  x2, x2, x23                  // Multiply quotient by #3
+    cmp  x0, x2                       // Compare x0 with the product
+    b.ne buzz_check                   // If x0 % 3 != 0, check for Buzz
+    add  x21, x21, #1                 // Increment the counter
+    ldr  x1, =fizz                    // Load the address of fizz into x1
+    bl   print_string                 // Call print_string
+buzz_check:
+    mov  x23, #5                      // Load #5 into x23
+    mov  x0, x20                      // Copy the number from x20 to x0
+    udiv x2, x0, x23                  // Divide x0 by #5
+    mul  x2, x2, x23                  // Multiply quotient by #5
+    cmp  x0, x2                       // Compare x0 with the product
+    b.ne print_number                 // If x0 % 5 != 0, print the number
+    add  x21, x21, #1                 // Increment the counter
+    ldr  x1, =buzz                    // Load the address of buzz into x1
+    bl   print_string                 // Call print_string
+    b    print_newline                // Skip printing the number
+print_number:
+    cmp  x21, #0                      // Compare the counter with 0
+    b.ne print_newline                // If counter != 0, skip printing the number
+    bl   itoa                         // Convert the integer to ASCII
+    bl   print_string                 // Call print_string
+print_newline:
+    ldr  x1, =newline                 // Load the address of newline character
+    bl   print_string                 // Call print_string
+increment:
+    add  x20, x20, #1                 // Increment x20
+    cmp  x20, #100                    // Compare x20 with #100
+    b.lt counter                      // If x20 < 100, continue the loop
+_exit:
+    mov  x0, #0                       // Set x0 to 0 (successful exit status)
+    mov  x8, #93                      // Set x8 to 93 (sys_exit syscall number)
+    svc  0                            // Make the syscall
 
-loop:
-    cmp x0, #32                 // Compare counter with 32
-    bge exit                    // If counter >= 32, branch to exit
-
-    ldr x0, =hello			   // Load address of hello into x0
-	bl print_string
-	b exit
-
-    // Convert number to string
-    mov x1, x0                  // Move counter value to x1
-    ldr x2, =number_buffer      // Load address of number_buffer into x2
-    bl int_to_string            // Call int_to_string function
-
-    // Print the number
-    ldr x0, =number_buffer      // Load address of number_buffer into x0
-    bl print_string             // Call print_string function
-
-    // Check divisibility by 3
-    mov x1, x0                  // Move number to x1
-    mov x2, #3                  // Move divisor 3 to x2
-    bl is_divisible             // Call is_divisible function
-    cmp x0, #1                  // Compare result with 1
-    bne skip_fizz               // If not divisible, skip printing "Fizz"
-    ldr x0, =fizz_str           // Load address of "Fizz" string into x0
-    ldr x1, =fizz_len           // Load length of "Fizz" into x1
-    bl print_fixed_string       // Call print_fixed_string function
-
-skip_fizz:                      // Label to skip printing "Fizz"
-
-    // Check divisibility by 5
-    mov x1, x0                  // Move number to x1
-    mov x2, #5                  // Move divisor 5 to x2
-    bl is_divisible             // Call is_divisible function
-    cmp x0, #1                  // Compare result with 1
-    bne skip_buzz               // If not divisible, skip printing "Buzz"
-    ldr x0, =buzz_str           // Load address of "Buzz" string into x0
-    ldr x1, =buzz_len           // Load length of "Buzz" into x1
-    bl print_fixed_string       // Call print_fixed_string function
-
-skip_buzz:                      // Label to skip printing "Buzz"
-
-    // Print newline
-    ldr x0, =newline            // Load address of newline into x0
-    ldr x1, =newline_len        // Load length of newline into x1
-    bl print_fixed_string       // Call print_fixed_string function
-
-    // Increment counter
-    add x0, x0, #1              // Increment counter by 1
-    b loop                      // Branch back to loop
-
-exit:
-    mov x0, #0                  // Set exit status to 0
-    mov x8, #93                 // Set syscall number for exit
-    svc 0                       // Make the syscall to exit
-
-// Function to check divisibility
-// Inputs:
-//   x1 - number
-//   x2 - divisor
-// Returns:
-//   x0 = 1 if divisible, else 0
-is_divisible:
-    udiv x3, x1, x2          	// Divide x1 by x2, store result in x3
-    mul x4, x3, x2           	// Multiply x3 by x2, store result in x4
-    cmp x4, x1               	// Compare x4 with original number
-    mov x0, #0               	// Initialize result to 0
-    cset x0, eq              	// Set x0 to 1 if equal (divisible)
-    ret                      	// Return from function
-
-// Function to convert integer to string
-// Inputs:
-//   x1 - number
-//   x2 - buffer address
-// Output:
-//   Buffer contains null-terminated string
-int_to_string:
-    mov x3, x2               	// Move buffer address to x3
-    mov x4, #10              	// Set base to 10
-    mov x5, #0               	// Initialize temporary register x5
-
-    cmp x1, #0               	// Compare number with 0
-    bne convert_loop         	// If not zero, branch to convert_loop
-    mov x5, #'0'             	// Move ASCII '0' to x5
-    strb w5, [x3], #1        	// Store byte in buffer and increment pointer
-    b convert_end            	// Branch to convert_end
-
-convert_loop:
-    mov x5, #0               	// Clear x5
-    mov x6, x1               	// Move number to x6
-    udiv x7, x6, x4           	// Divide x6 by 10, store quotient in x7
-    msub x8, x7, x4, x6       	// Multiply x7 by 10 and subtract from x6 to get remainder
-    add x8, x8, #'0'          	// Convert digit to ASCII
-    strb w8, [x3], #1         	// Store byte in buffer and increment pointer
-    mov x1, x7                	// Update number with quotient
-    cmp x1, #0                	// Compare number with 0
-    bne convert_loop            // If not zero, loop again
-
-convert_end:
-    mov x5, #0                  // Move null terminator to x5
-    strb wzr, [x3]              // Store null byte in buffer
-
-	// Reverse the string
-    mov x1, x2                	// Move buffer address to x1
-    sub x3, x3, x2            	// Calculate string length
-    subs x3, x3, #1           	// Adjust length for zero indexing
-    mov x4, #0                	// Initialize start index to 0
-
+// Function to convert an integer to an ASCII string
+// x0 = integer to convert
+// x1 = address of the buffer to store the ASCII string
+itoa:
+    prologue
+    mov  x10, x0                      // Copy the number from x0 to x10
+    mov  x11, x1                      // Copy the buffer address from x1 to x11
+    mov  x3, #0                       // Initialize digit count
+    mov  x6, #10                      // Load #10 into x6
+itoa_loop:
+    udiv x4, x10, x6                  // Divide x10 by #10, store quotient in x4
+    mul  x5, x4, x6                   // Multiply quotient by #10, store in x5
+    sub  x5, x10, x5                  // Subtract the product from x10, store remainder in x5
+    and  x5, x5, #0xff                // Clear upper bits
+    add  x5, x5, #48                  // Convert remainder to ASCII ('0' + remainder)
+    strb w5, [x1]                     // Store the ASCII character in the buffer pointed to by x1
+    add  x1, x1, #1                   // Increment the buffer pointer
+    add  x3, x3, #1                   // Increment digit count
+    mov  x10, x4                      // Update x10 with the quotient
+    cbnz x10, itoa_loop               // Continue if quotient is not zero
+reverse:
+    mov  x12, x11                     // Start pointer
+    add  x13, x11, x3                 // End pointer
+    sub  x13, x13, #1                 // Adjust end pointer to the last byte
 reverse_loop:
-    cmp x4, x3                	// Compare start and end indices
-    bge reverse_done          	// If start >= end, exit loop
-    ldrb w5, [x1, x4]         	// Load byte from start
-    ldrb w6, [x1, x3]         	// Load byte from end
-    strb w6, [x1, x4]         	// Store end byte at start
-    strb w5, [x1, x3]         	// Store start byte at end
-    add x4, x4, #1            	// Increment start index
-    sub x3, x3, #1            	// Decrement end index
-    b reverse_loop            	// Repeat loop
-
+    cmp  x12, x13                     // Compare start and end pointers
+    b.ge reverse_done                 // If start >= end, we're done
+    ldrb w14, [x12]                   // Load byte from start pointer
+    ldrb w15, [x13]                   // Load byte from end pointer
+    strb w15, [x12]                   // Store byte from end to start
+    strb w14, [x13]                   // Store byte from start to end
+    add  x12, x12, #1                 // Move start pointer forward
+    sub  x13, x13, #1                 // Move end pointer backward
+    b    reverse_loop                 // Repeat the loop
 reverse_done:
-    ret                        	// Return from function
+    //mov  x5, NEWLINE				  // Load newline character
+    //strb w5, [x1]                   // Store the newline
+    //add  x1, x1, #1                 // Increment the buffer pointer
+    mov  x5, NULL_TERMINATOR          // Null terminator
+    strb w5, [x1]                     // Store the null terminator
+    mov  x1, x11					  // Restore the buffer address from x11 to x1
+    epilogue
+    ret
 
-// Function to print a null-terminated string
-// Input:
-//   x0 - string address
 print_string:
-    mov x1, x0                  // Move string address to x1
-    bl strlen                 	// Call strlen to get string length
-    mov x2, x0                	// Move string address to x2
-    mov x8, #64               	// Set syscall number for sys_write
-    svc 0                     	// Make the syscall to write
-    ret                        	// Return from function
+    prologue
+    mov  x0, #1                       // Set x0 to 1 (file descriptor for stdout)
+    bl strlen                         // Call strlen to get the length of string pointed to by x1
+    nop                               // strlen side-effect => length stored in x2
+    mov  x8, #64                      // Set x8 to 64 (sys_write syscall number)
+    svc  0                            // Make the syscall
+    epilogue
+    ret
 
-// Function to print a fixed-length string
-// Inputs:
-//   x0 - string address
-//   x1 - length
-print_fixed_string:
-    mov x2, x1                	// Move length to x2
-    mov x1, x0                	// Move string address to x1
-    mov x8, #64               	// Set syscall number for sys_write
-    svc 0                     	// Make the syscall to write
-    ret                        	// Return from function
-
-// Function to calculate string length
-// Input:
-//   x1 - string address
-// Returns:
-//   x0 - length
 strlen:
-    mov x0, #0                	// Initialize length to 0
+    prologue
+    mov  x6, #0                       // Initialize x6 to 0
 strlen_loop:
-    ldrb w2, [x1, x0]         	// Load byte from string at [x1 + x0]
-    cmp w2, #0                	// Compare byte with null terminator
-    beq strlen_end            	// If null, branch to strlen_end
-    add x0, x0, #1            	// Increment length
-    b strlen_loop             	// Repeat loop
-strlen_end:
-    ret                        	// Return from function
+    ldrb w4, [x1, x6]                 // Load the byte at the address x1 + x6 into w4
+    cmp  w4, #0                       // Compare the byte in w4 with 0x0 null terminator
+    beq  strlen_done                  // If null detected, branch to strlen_done
+    add  x6, x6, #1                   // Otherwise, increment length in x6
+    b    strlen_loop                  // We're not done, go back to top of loop
+strlen_done:
+    mov  x2, x6                       // Move the length from x6 to x2
+    epilogue
+    ret
+
+_end:
+
+.section .data                         // Data section for storing constants
+    fizz:    .ascii "Fizz"             // Define the Fizz string
+             .byte 0                   // Null terminator
+    buzz:    .ascii "Buzz"             // Define the Buzz string
+             .byte 0                   // Null terminator
+    newline: .ascii "\n"               // Define the newline character
+             .byte 0                   // Null terminator
+.section .bss
+    .align 3                           // Align to 8-byte boundary
+    buffer:  .skip 32                  // Reserve space for the buffer

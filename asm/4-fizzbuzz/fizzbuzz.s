@@ -31,10 +31,10 @@ buzz_check:
     bl   print_string                 // Call print_string
     b    print_newline                // Skip printing the number
 print_number:
-    cmp  x21, #0                      // Compare the counter with 0
+    cmp  x21, #0                      // Compare the counter with #0
     b.ne print_newline                // If counter != 0, skip printing the number
     bl   itoa                         // Convert the integer to ASCII
-    bl   print_string                 // Call print_string
+    bl   print_string                 // Call print_string to print the number as ASCII
 print_newline:
     ldr  x1, =newline                 // Load the address of newline character
     bl   print_string                 // Call print_string
@@ -61,7 +61,7 @@ itoa_loop:
     mul  x5, x4, x3                   // Multiply quotient by #10, store in x5
     sub  x5, x10, x5                  // Subtract the product from x10, store remainder in x5
     and  x5, x5, #0xff                // Clear upper bits
-    add  x5, x5, #48                  // Convert remainder to ASCII ('0' + remainder)
+    add  x5, x5, ASCII_0              // Convert remainder to ASCII ('0' + remainder)
     strb w5, [x1]                     // Store the ASCII character in the buffer pointed to by x1
     add  x1, x1, #1                   // Increment the buffer pointer
     add  x2, x2, #1                   // Increment digit count

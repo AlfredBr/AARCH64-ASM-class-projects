@@ -12,3 +12,4 @@
 // Constants
 .equ NEWLINE, 10
 .equ NULL_TERMINATOR, 0
+.equ ASCII_0, 48

@@ -54,22 +54,22 @@ itoa:
     prologue
     mov  x10, x0                      // Copy the number from x0 to x10
     mov  x11, x1                      // Copy the buffer address from x1 to x11
-    mov  x3, #0                       // Initialize digit count
-    mov  x6, #10                      // Load #10 into x6
+    mov  x2, #0                       // Initialize digit count
+    mov  x3, #10                      // Load #10 into x3
 itoa_loop:
-    udiv x4, x10, x6                  // Divide x10 by #10, store quotient in x4
-    mul  x5, x4, x6                   // Multiply quotient by #10, store in x5
+    udiv x4, x10, x3                  // Divide x10 by #10, store quotient in x4
+    mul  x5, x4, x3                   // Multiply quotient by #10, store in x5
     sub  x5, x10, x5                  // Subtract the product from x10, store remainder in x5
     and  x5, x5, #0xff                // Clear upper bits
     add  x5, x5, #48                  // Convert remainder to ASCII ('0' + remainder)
     strb w5, [x1]                     // Store the ASCII character in the buffer pointed to by x1
     add  x1, x1, #1                   // Increment the buffer pointer
-    add  x3, x3, #1                   // Increment digit count
+    add  x2, x2, #1                   // Increment digit count
     mov  x10, x4                      // Update x10 with the quotient
     cbnz x10, itoa_loop               // Continue if quotient is not zero
 reverse:
     mov  x12, x11                     // Start pointer
-    add  x13, x11, x3                 // End pointer
+    add  x13, x11, x2                 // End pointer
     sub  x13, x13, #1                 // Adjust end pointer to the last byte
 reverse_loop:
     cmp  x12, x13                     // Compare start and end pointers
@@ -93,26 +93,26 @@ reverse_done:
 
 print_string:
     prologue
+    bl   strlen                       // Call strlen to get the length of string pointed to by x1
+    mov  x2, x0                       // Copy (the return value from strlen) length to x2
     mov  x0, #1                       // Set x0 to 1 (file descriptor for stdout)
-    bl strlen                         // Call strlen to get the length of string pointed to by x1
-    nop                               // strlen side-effect => length stored in x2
     mov  x8, #64                      // Set x8 to 64 (sys_write syscall number)
     svc  0                            // Make the syscall
     epilogue
     ret
 
-strlen:
+strlen:                               // strlen assumes x1 points to the string
     prologue
-    mov  x2, #0                       // Initialize x6 to 0
-strlen_loop:
-    ldrb w4, [x1, x2]                 // Load the byte at the address x1 + x6 into w4
-    cmp  w4, #0                       // Compare the byte in w4 with 0x0 null terminator
-    beq  strlen_done                  // If null detected, branch to strlen_done
-    add  x2, x2, #1                   // Otherwise, increment length in x6
+    mov  x0, #0                       // Initialize length counter to 0
+strlen_loop:                          // Loop to calculate the length of the string
+    ldrb w2, [x1, x0]                 // Load the byte at the address x1 + x0 into w2
+    cmp  w2, NULL_TERMINATOR          // Compare the byte in w2 with 0x0 null terminator
+    beq  strlen_done                  // If null detected, we know length, branch to strlen_done
+    add  x0, x0, #1                   // Otherwise, increment length in x0
     b    strlen_loop                  // We're not done, go back to top of loop
 strlen_done:
     epilogue
-    ret
+    ret                               // Return with length in x0
 
 _end:
 
@@ -125,4 +125,4 @@ _end:
              .byte 0                   // Null terminator
 .section .bss
     .align 3                           // Align to 8-byte boundary
-    buffer:  .skip 32                  // Reserve space for the buffer
+    buffer:  .skip 16                  // Reserve space for the buffer

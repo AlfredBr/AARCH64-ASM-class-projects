@@ -5,25 +5,25 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
-    mov  x20, #0                      // Initialize x20 to 0
+    mov  x20, #0                      // Initialize x20 to #0
 counter:
-    mov  x21, #0                      // Initialize x21 to 0
+    mov  x21, #0                      // Initialize x21 to #0
     ldr  x1, =buffer                  // Load the address of buffer into x1
 fizz_check:
-    mov  x23, #3                      // Load #3 into x23
+    mov  x6, #3                       // Load #3 into x6
     mov  x0, x20                      // Copy the number from x20 to x0
-    udiv x2, x0, x23                  // Divide x0 by #3
-    mul  x2, x2, x23                  // Multiply quotient by #3
+    udiv x2, x0, x6                   // Divide x0 by #3
+    mul  x2, x2, x6                   // Multiply quotient by #3
     cmp  x0, x2                       // Compare x0 with the product
     b.ne buzz_check                   // If x0 % 3 != 0, check for Buzz
     add  x21, x21, #1                 // Increment the counter
     ldr  x1, =fizz                    // Load the address of fizz into x1
     bl   print_string                 // Call print_string
 buzz_check:
-    mov  x23, #5                      // Load #5 into x23
+    mov  x6, #5                       // Load #5 into x6
     mov  x0, x20                      // Copy the number from x20 to x0
-    udiv x2, x0, x23                  // Divide x0 by #5
-    mul  x2, x2, x23                  // Multiply quotient by #5
+    udiv x2, x0, x6                   // Divide x0 by #5
+    mul  x2, x2, x6                   // Multiply quotient by #5
     cmp  x0, x2                       // Compare x0 with the product
     b.ne print_number                 // If x0 % 5 != 0, print the number
     add  x21, x21, #1                 // Increment the counter

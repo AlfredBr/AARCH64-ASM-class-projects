@@ -33,13 +33,15 @@ int implementation2()
 		int m = n * 3;
 		if ((x - m) == 0)
 		{
-			b += printf("Fizz");
+			printf("Fizz");
+			b++;
 		}
 		n = x / 5;
 		m = n * 5;
 		if ((x - m) == 0)
 		{
-			b += printf("Buzz");
+			printf("Buzz");
+			b++;
 		}
 		if (b == 0)
 		{

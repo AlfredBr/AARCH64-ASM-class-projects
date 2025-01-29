@@ -116,13 +116,13 @@ strlen_done:
 
 _end:
 
-.section .data                         // Data section for storing constants
-    fizz:    .ascii "Fizz"             // Define the Fizz string
-             .byte 0                   // Null terminator
-    buzz:    .ascii "Buzz"             // Define the Buzz string
-             .byte 0                   // Null terminator
-    newline: .ascii "\n"               // Define the newline character
-             .byte 0                   // Null terminator
+.section .data                        // Data section for storing constants
+    fizz:    .ascii "Fizz"            // Define the Fizz string
+             .byte 0                  // Null terminator
+    buzz:    .ascii "Buzz"            // Define the Buzz string
+             .byte 0                  // Null terminator
+    newline: .ascii "\n"              // Define the newline character
+             .byte 0                  // Null terminator
 .section .bss
-    .align 3                           // Align to 8-byte boundary
-    buffer:  .skip 16                  // Reserve space for the buffer
+    .align 3                          // Align to 8-byte boundary
+    buffer:  .skip 16                 // Reserve space for the buffer

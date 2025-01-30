@@ -20,7 +20,7 @@ int implementation1()
 		}
 		printf("\n");
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int implementation2()
@@ -49,7 +49,7 @@ int implementation2()
 		}
 		printf("\n");
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int implementation3()
@@ -63,7 +63,7 @@ int implementation3()
 		}
 		printf("\n");
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int main()

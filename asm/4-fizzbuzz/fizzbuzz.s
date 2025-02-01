@@ -5,9 +5,9 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
-    mov  x20, #0                      // Initialize x20 to #0
+    mov  x20, #0                      // Initialize loop counter (x20) to 0
 counter:
-    mov  x21, #0                      // Initialize x21 to #0
+    mov  x21, #0                      // Reset flag counter (x21) to 0
     ldr  x1, =buffer                  // Load the address of buffer into x1
 fizz_check:
     mov  x6, #3                       // Load #3 into x6

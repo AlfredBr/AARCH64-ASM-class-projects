@@ -8,15 +8,15 @@ _start:
     ldr x1, =msg                      // Load the address of msg into x1
     bl print_string                   // Call print_string
 init:
-	mov x20, #0
+    mov x20, #0                       // Initialize x20 to 0
 counter:
-    mov x0, x20                       // Load the integer #0 into x0
+    mov x0, x20                       // Load the integer x20 into x0
     ldr x1, =buffer                   // Load the address of buffer into x1
     bl itoa                           // Convert the integer to ASCII
     bl print_string                   // Call print_string
-	add x20, x20, #1				  // Increment x20
-	cmp x20, #100					  // Compare x20 with #100
-	b.lt counter				      // If x20 < 100, continue the loop
+    add x20, x20, #1                  // Increment x20
+    cmp x20, #100                     // Compare x20 with #100
+    b.lt counter                      // If x20 < 100, continue the loop
 _exit:
     mov x0, #0                        // Set x0 to 0 (successful exit status)
     mov x8, #93                       // Set x8 to 93 (sys_exit syscall number)
@@ -28,17 +28,17 @@ _exit:
 itoa:
     prologue
     mov  x10, x0                     // Copy the number from x0 to x10
-	mov  x11, x1					 // Copy the buffer address from x1 to x11
+    mov  x11, x1                     // Copy the buffer address from x1 to x11
     mov  x3, #0                      // Initialize digit count
     mov  x6, #10                     // Load #10 into x6
 itoa_loop:
     udiv x4, x10, x6                 // Divide x10 by #10, store quotient in x4
-	mul  x5, x4, x6                  // Multiply quotient by #10, store in x5
+    mul  x5, x4, x6                  // Multiply quotient by #10, store in x5
     sub  x5, x10, x5                 // Subtract the product from x10, store remainder in x5
-	and  x5, x5, #0xff               // Clear upper bits
+    and  x5, x5, #0xff               // Clear upper bits
     add  x5, x5, #48                 // Convert remainder to ASCII ('0' + remainder)
     strb w5, [x1]                    // Store the ASCII character in the buffer pointed to by x1
-	add  x1, x1, #1                  // Increment the buffer pointer
+    add  x1, x1, #1                  // Increment the buffer pointer
     add  x3, x3, #1                  // Increment digit count
     mov  x10, x4                     // Update x10 with the quotient
     cbnz x10, itoa_loop              // Continue if quotient is not zero
@@ -57,13 +57,13 @@ reverse_loop:
     sub x13, x13, #1                 // Move end pointer backward
     b reverse_loop                   // Repeat the loop
 reverse_done:
-    mov  x5, NEWLINE				 // Load newline character
+    mov  x5, NEWLINE                 // Load newline character
     strb w5, [x1]                    // Store the newline
-	add  x1, x1, #1                  // Increment the buffer pointer
+    add  x1, x1, #1                  // Increment the buffer pointer
     mov  x5, NULL_TERMINATOR         // Null terminator
     strb w5, [x1]                    // Store the null terminator
-	mov  x1, x11					 // Restore the buffer address from x11 to x1
-	epilogue
+    mov  x1, x11                     // Restore the buffer address from x11 to x1
+    epilogue
     ret
 
 print_string:
@@ -93,8 +93,8 @@ strlen_done:
 _end:
 
 .section .data                        // Data section for storing constants
-    msg:  	.ascii "Numbers\n"        // Define the message string
-          	.byte 0                   // Null terminator
+    msg:    .ascii "Numbers\n"        // Define the message string
+            .byte 0                   // Null terminator
 
 .section .bss
     .align 3                          // Align to 8-byte boundary

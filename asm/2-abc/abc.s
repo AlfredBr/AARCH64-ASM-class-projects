@@ -35,14 +35,12 @@ _exit:
 
 
 // Function to print a string
-// x1 = address of the string to print
-// x2 = length of the string
 print_string:
-    prologue          // Replace existing prologue
-    mov x0, #1        // Set x0 to 1 (file descriptor for stdout)
-    mov x8, #64       // Set x8 to 64 (sys_write syscall number)
+    prologue          // Function prologue
+    mov x0, #1        // File descriptor for stdout
+    mov x8, #64       // Syscall number for write
     svc 0             // Make the syscall
-    epilogue          // Replace existing epilogue
+    epilogue          // Function epilogue
 	ret
 
 _end:

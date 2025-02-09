@@ -5,10 +5,42 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
+	bl test_print_string
+	bl test_print_char
+	bl test_print_int
+	b _exit						      // Branch to exit
+
     ldr x0, =array                    // Load the address of the array into x0
     mov x1, #10                       // Load the size of the array into x1
     bl sort                           // Call the sort function
     bl print_array                    // Call the print_array function
+	b _exit                           // Branch to exit
+
+test_print_string:
+	prologue
+	ldr x1, =hello
+	bl print_string
+	epilogue
+	ret
+
+test_print_char:
+	prologue
+	mov x0, #65
+	bl print_char
+	mov x0, #10
+	bl print_char
+	epilogue
+	ret
+
+test_print_int:
+	prologue
+	mov x0, #1
+	bl print_int
+	mov x0, #10
+	bl print_char
+	epilogue
+	ret
+
 _exit:
     mov x0, #0                        // Set x0 to 0 (successful exit status)
     mov x8, #93                       // Set x8 to 93 (sys_exit syscall number)
@@ -75,19 +107,6 @@ print_done:
     epilogue
     ret
 
-// Function to print an integer
-// x0 = integer to print
-print_int:
-    prologue
-    mov x1, sp                        // Use stack as buffer
-    sub sp, sp, #16                   // Allocate space on stack
-    bl itoa                           // Convert integer to ASCII
-    mov x1, sp                        // Restore buffer address
-    bl print_string                   // Print the string
-    add sp, sp, #16                   // Deallocate space on stack
-    epilogue
-    ret
-
 // Function to print a character
 // x0 = character to print
 print_char:
@@ -99,6 +118,19 @@ print_char:
     mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
     svc 0                             // Make the syscall
     add sp, sp, #1                    // Deallocate space on stack
+    epilogue
+    ret
+
+// Function to print an integer
+// x0 = integer to print
+print_int:
+    prologue
+    mov x1, sp                        // Use stack as buffer / save sp in x1
+    sub sp, sp, #16                   // Allocate space on stack
+    bl itoa                           // Convert integer to ASCII
+    mov x1, sp                        // Restore buffer address
+    bl print_string                   // Print the string
+    add sp, sp, #16                   // Deallocate space on stack
     epilogue
     ret
 
@@ -125,9 +157,9 @@ itoa_loop:
 reverse:
     mov  x1, x11                      // Start pointer
     add  x2, x11, x2                  // End pointer
-    sub  x2, x2, #1                   // Adjust end pointer to the last byte
+    //sub  x2, x2, #1                   // Adjust end pointer to the last byte
 reverse_loop:
-    cmp  x1, x2                       // Compare start and end pointers
+    cmp  x1, x2                       // Compare start(x1) and end(x2) pointers
     b.ge reverse_done                 // If start >= end, we're done
     ldrb w6, [x1]                     // Load byte from start pointer
     ldrb w7, [x2]                     // Load byte from end pointer
@@ -142,10 +174,12 @@ reverse_done:
     epilogue
     ret
 
+// Function to print a string
+// x1 = address of the string
 print_string:
     prologue
     bl   strlen                       // Call strlen to get the length of string pointed to by x1
-    mov  x2, x0                       // Copy (the return value from strlen) length to x2
+    mov  x2, x0                       // Copy x0 (the return value from strlen) length to x2
     mov  x0, #1                       // Set x0 to 1 (file descriptor for stdout)
     mov  x8, #64                      // Set x8 to 64 (sys_write syscall number)
     svc  0                            // Make the syscall
@@ -165,10 +199,17 @@ strlen_done:
     epilogue
     ret                               // Return with length in x0
 
+clear_buffer:
+	prologue
+
+	epilogue
+	ret
+
 _end:
 
 .section .data                        // Data section for storing constants
-    array:  .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0  // Define the array
+	hello: .asciz "Hello, World!\n"  // Define a null-terminated string
+    array: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0  // Define the array
 .section .bss
     .align 3                          // Align to 8-byte boundary
-    buffer:  .skip 16                 // Reserve space for the buffer
+    buffer: .skip 16                 // Reserve space for the buffer

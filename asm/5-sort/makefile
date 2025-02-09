@@ -11,7 +11,7 @@ $(TARGET): $(TARGET).o
 	$(LD) -g -o $@ $<
 
 clean:
-	rm -f $(TARGET) a.out *.o *.disasm
+	@rm -f $(TARGET) a.out *.o *.disasm
 
 run: $(TARGET)
 	./$(TARGET)

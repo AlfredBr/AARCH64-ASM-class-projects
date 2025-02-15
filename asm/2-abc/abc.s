@@ -2,6 +2,7 @@
 // from 'A' to 'Z' and prints it to the console.
 // Syscall info: https://arm64.syscall.sh/
 // Procedure call standard: https://developer.arm.com/documentation/dui0041/c/ARM-Procedure-Call-Standard/About-the-ARM-Procedure-Call-Standard?lang=en
+// ASCII Table: https://www.asciitable.com/
 
 .section .text
 .global _start

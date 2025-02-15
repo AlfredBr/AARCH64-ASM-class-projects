@@ -45,6 +45,6 @@ strlen_end:
 
 _end:
 
-.section .data                        // Data section for storing constants
+.section .data                       // Data section for storing constants
     msg:    .ascii "Hello, World!\n" // Define the message string
             .byte 0                  // Null terminator

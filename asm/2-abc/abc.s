@@ -11,22 +11,22 @@
 .include "macros.s"
 
 _start:
-	ldr x6, =buffer   // Load the address of buffer into x6
+	ldr x1, =buffer   // Load the address of buffer into x1
 	mov w0, #65       // Move ASCII code for 'A' to w0
-	mov x7, #26       // Move the max length of the string to x7
-	mov x2, #0        // Initialize the w2 index to 0
+	mov x7, #26       // Move the max length of the string (26 chars) to x7
+	mov x2, #0        // Initialize the w2 index (our length counter) to 0
 
 _loop_start:
-	strb w0, [x6]     // Store 'A' in buffer
-	add x6, x6, #1    // Increment the address in x6
+	strb w0, [x1]     // Store 'A' in buffer
+	add x1, x1, #1    // Increment the address in x1
 	add w0, w0, #1    // Move to the next ASCII code
 	add x2, x2, #1    // Increment the index
 	cmp x2, x7        // Compare the index with the length
 	b.lt _loop_start  // If index < length, loop back
-	mov w0, #10       // Move ASCII code for '\n' to w0
-	strb w0, [x6]	  // Store the ASCII code for '\n' in buffer
+	mov w0, NEWLINE   // Move ASCII code for '\n' to w0
+	strb w0, [x1]	  // Store the ASCII code for '\n' in buffer
 	add x2, x2, #1    // Increment the length
-	ldr x1, =buffer   // Load the address of buffer into x1
+	ldr x1, =buffer   // reset x1 to the start of the buffer
 	bl print_string   // Call print_string
 
 _exit:
@@ -36,6 +36,8 @@ _exit:
 
 
 // Function to print a string
+// x1 = pointer to (address to start of) the string
+// x2 = length of the string
 print_string:
     prologue          // Function prologue
     mov x0, #1        // File descriptor for stdout

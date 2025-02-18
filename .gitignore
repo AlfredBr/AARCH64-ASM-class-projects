@@ -13,3 +13,4 @@ asm/4-fizzbuzz/fizzbuzz
 asm/4-fizzbuzz/fizzbuzz.o
 asm/5-sort/sort.o
 asm/5-sort/sort
+asm/3-numbers/.gdb_history

@@ -68,9 +68,9 @@ reverse_done:
 
 print_string:
     prologue
-    mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
     bl strlen                         // Call strlen to get the length of string pointed to by x1
     nop                               // strlen side-effect => length stored in x2
+    mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
     mov x8, #64                       // Set x8 to 64 (sys_write syscall number)
     svc 0                             // Make the syscall
     epilogue

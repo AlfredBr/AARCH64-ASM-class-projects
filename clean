@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# List of subdirectories to clean, ignoring .git folder
+SUBDIRS=`find . -type d -not -path '*/.git*'`
+
+for dir in $SUBDIRS; do
+    if [ -d "$dir" ]; then
+        echo "Cleaning $dir"
+        make -C "$dir" clean
+    else
+        echo "Directory $dir does not exist"
+    fi
+done

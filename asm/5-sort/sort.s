@@ -5,16 +5,27 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
-	bl test_print_string
-	bl test_print_char
-	bl test_print_int
-	b _exit						      // Branch to exit
+    //bl test_print_string
+    //bl test_print_char
+    //bl test_clear_buffer
+    bl test_print_int
+    b _exit						      // Branch to exit
 
     ldr x0, =array                    // Load the address of the array into x0
     mov x1, #10                       // Load the size of the array into x1
     bl sort                           // Call the sort function
     bl print_array                    // Call the print_array function
-	b _exit                           // Branch to exit
+    b _exit                           // Branch to exit
+
+test_clear_buffer:
+    prologue
+    mov x0, #16                       // Load the size of the buffer into x0
+    ldr x1, =buffer                   // Load the address of the buffer into x1
+    bl clear_buffer                   // Call the clear_buffer function
+    ldr x1, =buffer                   // Load the address of the buffer into x1
+    bl print_string                   // Call the print_string function
+    epilogue
+    ret
 
 test_print_string:
 	prologue
@@ -34,7 +45,7 @@ test_print_char:
 
 test_print_int:
 	prologue
-	mov x0, #1
+	mov x0, #69
 	bl print_int
 	mov x0, #10
 	bl print_char
@@ -66,7 +77,7 @@ sort_inner_loop:
     mov x6, x0                        // Move the address of the array to x6
     add x6, x6, x2, lsl #2            // Calculate the address of a[i]
     add x7, x0, x3, lsl #2            // Calculate the address of a[j]
-    bl swap                           // Call the swap function
+    bl swap_int                       // Call the swap_int function
 sort_inner_next:
     add x3, x3, #1                    // Increment j
     b sort_inner_loop                 // Repeat the inner loop
@@ -77,10 +88,10 @@ sort_done:
     epilogue
     ret
 
-// Function to swap two integers
+// swap_int: Function to swap two integers
 // x0 = address of the first integer
 // x1 = address of the second integer
-swap:
+swap_int:
     prologue
     ldr w2, [x0]                      // Load the first integer into w2
     ldr w3, [x1]                      // Load the second integer into w3
@@ -89,7 +100,7 @@ swap:
     epilogue
     ret
 
-// Function to print the array
+// print_array: Function to print the array
 // x0 = address of the array
 print_array:
     prologue
@@ -107,7 +118,7 @@ print_done:
     epilogue
     ret
 
-// Function to print a character
+// print_char: Function to print a character
 // x0 = character to print
 print_char:
     prologue
@@ -134,7 +145,7 @@ print_int:
     epilogue
     ret
 
-// Function to convert an integer to an ASCII string
+// itoa: Function to convert an integer to an ASCII string
 // x0 = integer to convert
 // x1 = address of the buffer to store the ASCII string
 itoa:
@@ -174,7 +185,7 @@ reverse_done:
     epilogue
     ret
 
-// Function to print a string
+// print_string: Function to print a string
 // x1 = address of the string
 print_string:
     prologue
@@ -186,6 +197,9 @@ print_string:
     epilogue
     ret
 
+// strlen: Function to calculate the length of a string
+// x0 = length of the string (output)
+// x1 = address of the string
 strlen:                               // strlen assumes x1 points to the string
     prologue
     mov  x0, #0                       // Initialize length counter to 0
@@ -199,17 +213,27 @@ strlen_done:
     epilogue
     ret                               // Return with length in x0
 
+// clear_buffer: Function to clear the buffer
+// x0 = size of the buffer
+// x1 = address of the buffer
 clear_buffer:
-	prologue
-
-	epilogue
-	ret
+    prologue
+    mov x2, #0                        // Initialize the value to clear with (0)
+clear_loop:
+    cmp x0, #0                        // Compare size with 0
+    beq clear_done                    // If size is 0, we're done
+    strb w2, [x1], #1                 // Store 0 at the buffer address and increment the address
+    sub x0, x0, #1                    // Decrement the size
+    b clear_loop                      // Repeat the loop
+clear_done:
+    epilogue
+    ret
 
 _end:
 
 .section .data                        // Data section for storing constants
-	hello: .asciz "Hello, World!\n"  // Define a null-terminated string
+	hello: .asciz "Hello, World!\n"   // Define a null-terminated string
     array: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0  // Define the array
 .section .bss
     .align 3                          // Align to 8-byte boundary
-    buffer: .skip 16                 // Reserve space for the buffer
+    buffer: .skip 16                  // Reserve space for the buffer

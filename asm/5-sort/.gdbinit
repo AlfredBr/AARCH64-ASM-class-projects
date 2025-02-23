@@ -3,5 +3,3 @@ set print pretty
 set confirm off
 layout regs
 break _start
-break main
-break itoa

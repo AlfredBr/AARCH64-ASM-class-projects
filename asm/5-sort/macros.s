@@ -1,15 +1,15 @@
 // Define the prologue macro
 .macro prologue
-    stp x29, x30, [sp, #-16]!    // Save x29 and x30
-    mov x29, sp                  // Set frame pointer
+    stp     x29, x30, [sp, #-16]!    // Save frame pointer and link register
+    mov     x29, sp                  // Set frame pointer to stack pointer
 .endm
 
 // Define the epilogue macro
 .macro epilogue
-    ldp x29, x30, [sp], #16      // Restore x29 and x30
+    ldp     x29, x30, [sp], #16      // Restore frame pointer and link register
 .endm
 
 // Constants
-.equ NEWLINE, 10
-.equ NULL_TERMINATOR, 0
-.equ ASCII_0, 48
+.equ    NEWLINE, '\n'
+.equ    NULL_TERMINATOR, 0
+.equ    ASCII_0, '0'

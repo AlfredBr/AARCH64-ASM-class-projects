@@ -1,14 +1,14 @@
-.global _start                        // Define the entry point
-.align 2                              // Align to 8-byte boundary
+.global _start                    // Define the entry point
+.align 2                          // Align to 8-byte boundary
 
-.section .text                        // Text section for code
-.include "macros.s"                   // Include the macros file
+.section .text                    // Text section for code
+.include "macros.s"               // Include the macros file
 
 _start:
     //bl test_print_string
     //bl test_print_char
     //bl test_clear_buffer
-    bl test_print_int
+    //bl test_print_int
     b _exit						      // Branch to exit
 
     ldr x0, =array                    // Load the address of the array into x0
@@ -36,7 +36,11 @@ test_print_string:
 
 test_print_char:
 	prologue
-	mov x0, #65
+	mov x0, 'A'
+	bl print_char
+	mov x0, 'R'
+	bl print_char
+	mov x0, 'M'
 	bl print_char
 	mov x0, #10
 	bl print_char
@@ -45,7 +49,7 @@ test_print_char:
 
 test_print_int:
 	prologue
-	mov x0, #69
+	mov x0, #12345
 	bl print_int
 	mov x0, #10
 	bl print_char
@@ -53,162 +57,162 @@ test_print_int:
 	ret
 
 _exit:
-    mov x0, #0                        // Set x0 to 0 (successful exit status)
-    mov x8, #93                       // Set x8 to 93 (sys_exit syscall number)
-    svc 0                             // Make the syscall
+    mov     x0, #0                // Set x0 to 0 (exit status)
+    mov     x8, #93               // Syscall: exit (93)
+    svc     0                     // Make the syscall
 
 // Function to sort the array
-// x0 = address of the array
-// x1 = size of the array
+//   x0 = address of the array
+//   x1 = size of the array
 sort:
     prologue
-    mov x2, #0                        // Initialize i to 0
+    mov     x2, #0                // Initialize outer loop index i to 0
 sort_outer_loop:
-    cmp x2, x1                        // Compare i with size
-    b.ge sort_done                    // If i >= size, we're done
-    add x3, x2, #1                    // Initialize j to i + 1
+    cmp     x2, x1                // If i >= size, sorting is done
+    b.ge    sort_done
+    add     x3, x2, #1            // Set j = i + 1
 sort_inner_loop:
-    cmp x3, x1                        // Compare j with size
-    b.ge sort_outer_next              // If j >= size, go to next iteration of outer loop
-    ldr w4, [x0, x2, lsl #2]          // Load a[i] into w4
-    ldr w5, [x0, x3, lsl #2]          // Load a[j] into w5
-    cmp w4, w5                        // Compare a[i] with a[j]
-    b.le sort_inner_next              // If a[i] <= a[j], go to next iteration of inner loop
-    mov x6, x0                        // Move the address of the array to x6
-    add x6, x6, x2, lsl #2            // Calculate the address of a[i]
-    add x7, x0, x3, lsl #2            // Calculate the address of a[j]
-    bl swap_int                       // Call the swap_int function
+    cmp     x3, x1                // If j >= size, break inner loop
+    b.ge    sort_outer_next
+    ldr     w4, [x0, x2, lsl #2]   // Load a[i] into w4
+    ldr     w5, [x0, x3, lsl #2]   // Load a[j] into w5
+    cmp     w4, w5                 // Compare a[i] and a[j]
+    b.le    sort_inner_next        // If a[i] <= a[j] then continue inner loop
+    ;                              // Swap a[i] and a[j]
+    add     x6, x0, x2, lsl #2     // Address of a[i] into x6
+    add     x7, x0, x3, lsl #2     // Address of a[j] into x7
+    mov     x0, x6                 // First swap parameter in x0
+    mov     x1, x7                 // Second swap parameter in x1
+    bl      swap_int               // Call swap_int function
 sort_inner_next:
-    add x3, x3, #1                    // Increment j
-    b sort_inner_loop                 // Repeat the inner loop
+    add     x3, x3, #1             // Increment inner loop index j
+    b       sort_inner_loop
 sort_outer_next:
-    add x2, x2, #1                    // Increment i
-    b sort_outer_loop                 // Repeat the outer loop
+    add     x2, x2, #1             // Increment outer loop index i
+    b       sort_outer_loop
 sort_done:
     epilogue
     ret
 
-// swap_int: Function to swap two integers
-// x0 = address of the first integer
-// x1 = address of the second integer
+// swap_int: Swap two integers
+//   x0 = address of the first integer
+//   x1 = address of the second integer
 swap_int:
     prologue
-    ldr w2, [x0]                      // Load the first integer into w2
-    ldr w3, [x1]                      // Load the second integer into w3
-    str w3, [x0]                      // Store the second integer at the address of the first integer
-    str w2, [x1]                      // Store the first integer at the address of the second integer
+    ldr     w2, [x0]            // Load first integer into w2
+    ldr     w3, [x1]            // Load second integer into w3
+    str     w3, [x0]            // Store second integer at address of first
+    str     w2, [x1]            // Store first integer at address of second
     epilogue
     ret
 
-// print_array: Function to print the array
-// x0 = address of the array
+// print_array: Print the integer array
+//   x0 = address of the array
 print_array:
     prologue
-    mov x1, #0                        // Initialize index to 0
+    mov     x1, #0               // Initialize index to 0
 print_loop:
-    cmp x1, #10                       // Compare index with size
-    b.ge print_done                   // If index >= size, we're done
-    ldr w2, [x0, x1, lsl #2]          // Load the array element into w2
-    bl print_int                      // Call the print_int function
-    mov w2, NEWLINE                   // Load newline character
-    bl print_char                     // Call the print_char function
-    add x1, x1, #1                    // Increment index
-    b print_loop                      // Repeat the loop
+    cmp     x1, #10              // If index >= size, done
+    b.ge    print_done
+    ldr     w2, [x0, x1, lsl #2] // Load array element into w2
+    bl      print_int            // Print the integer
+    mov     w2, NEWLINE          // Load newline character
+    bl      print_char           // Print the newline
+    add     x1, x1, #1           // Increment index
+    b       print_loop
 print_done:
     epilogue
     ret
 
-// print_char: Function to print a character
-// x0 = character to print
-print_char:
-    prologue
-    strb w0, [sp, #-1]!               // Store the character on the stack
-    mov x1, sp                        // Set x1 to the address of the character
-    mov x2, #1                        // Set x2 to the length of the string (1)
-    mov x8, #64                       // Set x8 to 64 (sys_write syscall number)
-    mov x0, #1                        // Set x0 to 1 (file descriptor for stdout)
-    svc 0                             // Make the syscall
-    add sp, sp, #1                    // Deallocate space on stack
-    epilogue
-    ret
-
-// Function to print an integer
-// x0 = integer to print
+// print_int: Print an integer
+//   x0 = integer to print
 print_int:
     prologue
-    mov x1, sp                        // Use stack as buffer / save sp in x1
-    sub sp, sp, #16                   // Allocate space on stack
-    bl itoa                           // Convert integer to ASCII
-    mov x1, sp                        // Restore buffer address
-    bl print_string                   // Print the string
-    add sp, sp, #16                   // Deallocate space on stack
+    bl      itoa                // Convert integer (x0) to ASCII in buffer at sp
+    bl      print_string        // Print the string at x1 (buffer)
     epilogue
     ret
 
-// itoa: Function to convert an integer to an ASCII string
-// x0 = integer to convert
-// x1 = address of the buffer to store the ASCII string
+// itoa: Convert integer to ASCII string
+//   x0 = integer to convert
+//   x1 = address of buffer to store string
 itoa:
     prologue
-    mov  x10, x0                      // Copy the number from x0 to x10
-    mov  x11, x1                      // Copy the buffer address from x1 to x11
-    mov  x2, #0                       // Initialize digit count
-    mov  x3, #10                      // Load #10 into x3
+    ldr     x1, =buffer		    // x1 = buffer address
+    mov     x2, x0              // x2 = integer value
+    mov     x3, x1              // x3 = preserve starting buffer address
+    mov     x4, #0              // x4 = digit count = 0
+    mov     x6, #10             // x6 = divisor (10)
 itoa_loop:
-    udiv x4, x10, x3                  // Divide x10 by #10, store quotient in x4
-    mul  x5, x4, x3                   // Multiply quotient by #10, store in x5
-    sub  x5, x10, x5                  // Subtract the product from x10, store remainder in x5
-    and  x5, x5, #0xff                // Clear upper bits
-    add  x5, x5, ASCII_0              // Convert remainder to ASCII ('0' + remainder)
-    strb w5, [x1]                     // Store the ASCII character in the buffer pointed to by x1
-    add  x1, x1, #1                   // Increment the buffer pointer
-    add  x2, x2, #1                   // Increment digit count
-    mov  x10, x4                      // Update x10 with the quotient
-    cbnz x10, itoa_loop               // Continue if quotient is not zero
+    udiv    x10, x2, x6         // x10 = x2 / 10 (quotient)
+    mul     x12, x10, x6        // x12 = quotient * 10
+    sub     x14, x2, x12        // x14 = remainder = x2 - (quotient * 10)
+    and     x14, x14, #0xff     // Clear any upper bits
+    add     x14, x14, ASCII_0   // Convert to ASCII digit
+    strb    w14, [x1]           // Store digit in buffer pointed to by x1
+    add     x1, x1, #1          // Advance buffer pointer
+    add     x4, x4, #1          // Increment digit count
+    mov     x2, x10             // x2 = quotient
+    cbnz    x2, itoa_loop       // Loop if quotient != 0
 reverse:
-    mov  x1, x11                      // Start pointer
-    add  x2, x11, x2                  // End pointer
-    //sub  x2, x2, #1                   // Adjust end pointer to the last byte
+    mov     x5, x3              // x5 = start pointer = original buffer address
+    mov     x7, x1              // x7 = end pointer = current x1
+    sub     x7, x7, #1          // Adjust x7 to last valid character
 reverse_loop:
-    cmp  x1, x2                       // Compare start(x1) and end(x2) pointers
-    b.ge reverse_done                 // If start >= end, we're done
-    ldrb w6, [x1]                     // Load byte from start pointer
-    ldrb w7, [x2]                     // Load byte from end pointer
-    strb w7, [x1]                     // Store byte from end to start
-    strb w6, [x2]                     // Store byte from start to end
-    add  x1, x1, #1                   // Move start pointer forward
-    sub  x2, x2, #1                   // Move end pointer backward
-    b    reverse_loop                 // Repeat the loop
+    cmp     x5, x7              // Compare start and end pointers
+    b.ge    reverse_done        // Finished if start >= end
+    ldrb    w6, [x5]            // Load byte from start pointer
+    ldrb    w8, [x7]            // Load byte from end pointer
+    strb    w8, [x5]            // Swap: store byte from end at start
+    strb    w6, [x7]            // Swap: store byte from start at end
+    add     x5, x5, #1          // Advance start pointer
+    sub     x7, x7, #1          // Decrement end pointer
+    b       reverse_loop
 reverse_done:
-    mov  x5, NULL_TERMINATOR          // Null terminator
-    strb w5, [x1]                     // Store the null terminator
+    mov     x14, NULL_TERMINATOR// Load null terminator
+    strb    w14, [x1]           // Store null terminator at buffer end
+	ldr     x1, =buffer		    // x1 = buffer address
     epilogue
     ret
 
-// print_string: Function to print a string
-// x1 = address of the string
+// print_char: Print a single character
+//   x0 = character to print
+print_char:
+    prologue
+    strb    w0, [sp, #-1]!      // Push character onto stack
+    mov     x1, sp              // Set x1 to address of the character
+    mov     x2, #1              // Length = 1 for one character
+    mov     x8, #64             // Syscall number for write
+    mov     x0, #1              // File descriptor stdout
+    svc     0                   // Make syscall
+    add     sp, sp, #1          // Pop the character from the stack
+    epilogue
+    ret
+
+// print_string: Print a null-terminated string
+//   x1 = address of the string
+//   x2 = length (returned by strlen)
 print_string:
     prologue
-    bl   strlen                       // Call strlen to get the length of string pointed to by x1
-    mov  x2, x0                       // Copy x0 (the return value from strlen) length to x2
-    mov  x0, #1                       // Set x0 to 1 (file descriptor for stdout)
-    mov  x8, #64                      // Set x8 to 64 (sys_write syscall number)
-    svc  0                            // Make the syscall
+    bl      strlen              // x0 = length of string at x1
+    mov     x2, x0              // Copy length into x2
+    mov     x0, #1              // File descriptor stdout
+    mov     x8, #64             // Syscall number for write
+    svc     0                   // Make syscall
     epilogue
     ret
 
-// strlen: Function to calculate the length of a string
-// x0 = length of the string (output)
-// x1 = address of the string
-strlen:                               // strlen assumes x1 points to the string
+// strlen: Calculate length of a null-terminated string
+//   x1 = address of the string; returns length in x0
+strlen:
     prologue
-    mov  x0, #0                       // Initialize length counter to 0
-strlen_loop:                          // Loop to calculate the length of the string
-    ldrb w2, [x1, x0]                 // Load the byte at the address x1 + x0 into w2
-    cmp  w2, NULL_TERMINATOR          // Compare the byte in w2 with 0x0 null terminator
-    beq  strlen_done                  // If null detected, we know length, branch to strlen_done
-    add  x0, x0, #1                   // Otherwise, increment length in x0
-    b    strlen_loop                  // We're not done, go back to top of loop
+    mov     x0, #0              // Initialize length counter in x0
+strlen_loop:
+    ldrb    w2, [x1, x0]        // Load byte at x1 + x0
+    cmp     w2, NULL_TERMINATOR // Compare to null terminator
+    beq     strlen_done         // If found, finish
+    add     x0, x0, #1          // Increment length counter
+    b       strlen_loop
 strlen_done:
     epilogue
     ret                               // Return with length in x0
@@ -231,9 +235,10 @@ clear_done:
 
 _end:
 
-.section .data                        // Data section for storing constants
+.section .data                    // Data section for constants
 	hello: .asciz "Hello, World!\n"   // Define a null-terminated string
-    array: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0  // Define the array
-.section .bss
-    .align 3                          // Align to 8-byte boundary
-    buffer: .skip 16                  // Reserve space for the buffer
+    array:  .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0   // The unsorted array
+
+.section .bss                     // Uninitialized data section
+    .align 3                      // Align to 8-byte boundary
+    buffer:  .skip 16             // Reserve 16 bytes for integer-to-ASCII conversion

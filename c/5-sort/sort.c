@@ -5,14 +5,14 @@
 
 void swap(int *a, int *b)
 {
-	int t = *a;
+	auto t = *a;
 	*a = *b;
 	*b = t;
 }
 
-void print(int *a)
+void println(int *a)
 {
-	for (int i = 0; i < N; i++)
+	for (auto i = 0; i < N; i++)
 	{
 		printf("%d ", a[i]);
 	}
@@ -21,21 +21,20 @@ void print(int *a)
 
 int main()
 {
-	int a[N] = {5, 4, 3, 2, 1, 9, 8, 7, 6, 0};
-	int i, j;
+	auto a[N] = {5, 4, 3, 2, 1, 9, 8, 7, 6, 0};
 
-	for (i = 0; i < N; i++)
+	for (auto i = 0; i < N; i++)
 	{
-		for (j = i + 1; j < N; j++)
+		for (auto j = i + 1; j < N; j++)
 		{
-			print(a);
+			println(a);
 			if (a[i] > a[j])
 			{
 				swap(&a[i], &a[j]);
 			}
 		}
 	}
-	print(a);
+	println(a);
 
 	return EXIT_SUCCESS;
 }

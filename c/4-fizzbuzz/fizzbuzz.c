@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX 100
+
 char *fn(int x, char *s)
 {
 	return (x == 0) ? s : "";
@@ -8,7 +10,6 @@ char *fn(int x, char *s)
 
 int implementation1()
 {
-	const int MAX = 100;
 	for (int x = 0; x < MAX; x++)
 	{
 		char *f = fn(x % 3, "Fizz");
@@ -25,7 +26,6 @@ int implementation1()
 
 int implementation2()
 {
-	const int MAX = 100;
 	for (int x = 0; x < MAX; x++)
 	{
 		int b = 0;
@@ -54,7 +54,6 @@ int implementation2()
 
 int implementation3()
 {
-	const int MAX = 100;
 	for (int x = 0; x < MAX; x++)
 	{
 		if (!printf("%s%s", fn(x % 3, "Fizz"), fn(x % 5, "Buzz")))

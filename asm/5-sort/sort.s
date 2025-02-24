@@ -9,6 +9,7 @@ _start:
     //bl test_print_char
     //bl test_clear_buffer
     //bl test_print_int
+	bl test_print_array
     b _exit						      // Branch to exit
 
     ldr x0, =array                    // Load the address of the array into x0
@@ -26,6 +27,13 @@ test_clear_buffer:
     bl print_string                   // Call the print_string function
     epilogue
     ret
+
+test_print_array:
+	prologue
+	ldr x25, =array                   // Load the address of the array into x25
+	bl print_array                    // Call the print_array function
+	epilogue
+	ret
 
 test_print_string:
 	prologue
@@ -110,17 +118,19 @@ swap_int:
 //   x0 = address of the array
 print_array:
     prologue
-    mov     x1, #0               // Initialize index to 0
+    mov     x23, #0               // Initialize index to 0
 print_loop:
-    cmp     x1, #10              // If index >= size, done
+    cmp     x23, #40              // If index >= size, done
     b.ge    print_done
-    ldr     w2, [x0, x1, lsl #2] // Load array element into w2
+    ldr     w0, [x23, x25]         // Load array element into w2
     bl      print_int            // Print the integer
-    mov     w2, NEWLINE          // Load newline character
+    mov     x0, SPACE          // Load space character
     bl      print_char           // Print the newline
-    add     x1, x1, #1           // Increment index
+    add     x23, x23, #4           // Increment index
     b       print_loop
 print_done:
+    mov     x0, NEWLINE          // Load newline character
+    bl      print_char           // Print the newline
     epilogue
     ret
 
@@ -218,8 +228,8 @@ strlen_done:
     ret                               // Return with length in x0
 
 // clear_buffer: Function to clear the buffer
-// x0 = size of the buffer
-// x1 = address of the buffer
+// 	 x0 = size of the buffer
+//   x1 = address of the buffer
 clear_buffer:
     prologue
     mov x2, #0                        // Initialize the value to clear with (0)
@@ -237,7 +247,7 @@ _end:
 
 .section .data                    // Data section for constants
 	hello: .asciz "Hello, World!\n"   // Define a null-terminated string
-    array:  .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0   // The unsorted array
+    array: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0   // The unsorted array
 
 .section .bss                     // Uninitialized data section
     .align 3                      // Align to 8-byte boundary

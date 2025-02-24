@@ -10,6 +10,7 @@
 .endm
 
 // Constants
+.equ    SPACE, 32
 .equ    NEWLINE, '\n'
 .equ    NULL_TERMINATOR, 0
 .equ    ASCII_0, '0'

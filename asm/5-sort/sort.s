@@ -122,15 +122,15 @@ print_array:
 print_loop:
     cmp     x23, #40              // If index >= size, done
     b.ge    print_done
-    ldr     w0, [x23, x25]         // Load array element into w2
-    bl      print_int            // Print the integer
-    mov     x0, SPACE          // Load space character
-    bl      print_char           // Print the newline
-    add     x23, x23, #4           // Increment index
+    ldr     w0, [x23, x25]        // Load array element into w2
+    bl      print_int             // Print the integer
+    mov     x0, SPACE             // Load space character
+    bl      print_char            // Print the newline
+    add     x23, x23, #4          // Increment index
     b       print_loop
 print_done:
-    mov     x0, NEWLINE          // Load newline character
-    bl      print_char           // Print the newline
+    mov     x0, NEWLINE           // Load newline character
+    bl      print_char            // Print the newline
     epilogue
     ret
 

@@ -15,7 +15,7 @@ To see the result...
 $ echo $?
 42
 ```
-#### And we turn that into an ARM Assembly program
+#### And we write the equivalent in ARM Assembly language...
 ``` asm
 .section .text                        // Text section for code
 .global _start                        // Define the entry point

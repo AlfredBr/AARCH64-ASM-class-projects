@@ -46,3 +46,4 @@ _start:
 - [ARM Assembly Language Reference](https://developer.arm.com/documentation/100076/0100)
 - [LINUX SysCall info](https://arm64.syscall.sh/)
 - [ASCII Table](https://www.asciitable.com/)
+- [GDB TUI Documentation](https://sourceware.org/gdb/current/onlinedocs/gdb.html/TUI-Commands.html)

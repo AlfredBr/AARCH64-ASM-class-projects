@@ -26,7 +26,7 @@ _start:
 > |Entry Points, Registers, Syscalls, Assembly Syntax, File Sections, Directives, Return values, Data Types|
 
 ### Hour 1 - Hello, World!
-> In `Hour 1` we write Hello, World! in ARM Assembly and get into loops and function calls.  (Note: we print Hello World one character at at time.)
+> In `Hour 1` we write Hello, World! in ARM Assembly and introduce loops and function calls.  (Note: we print "Hello, World!" one character at at time.)
 > |Topics Covered|
 > |---|
 > |Loops, Functions, Strings, ASCII, Registers, Branching, Conditionals, Stack, Pointers, Memory, Data Types|

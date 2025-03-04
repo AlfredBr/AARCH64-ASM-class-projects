@@ -10,6 +10,7 @@ int main()
    return 42;
 }
 ```
+To see the result...
 ``` bash
 $ echo $?
 42
@@ -24,6 +25,7 @@ _start:
    mov x8, #93                       // Set x8 to 93 (sys_exit syscall number)
    svc 0                             // Make the syscall
 ```
+To see the result...
 ``` bash
 $ echo $?
 42

@@ -41,3 +41,8 @@ _start:
 > In `Hour 4` we write a program that implements the famous FizzBuzz algorithm from 1 to 100.  This lesson is a bit more challenging than the previous lessons, but it is a great way to learn about branching and conditionals.
 ### Bonus 5 - Sorting
 > In the bonus hour we write a program that sorts and prints an array of integers in ARM Assembly.
+
+# Useful Links
+- [ARM Assembly Language Reference](https://developer.arm.com/documentation/100076/0100)
+- [LINUX SysCall info](https://arm64.syscall.sh/)
+- [ASCII Table](https://www.asciitable.com/)

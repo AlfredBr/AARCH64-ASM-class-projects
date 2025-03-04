@@ -10,6 +10,10 @@ int main()
    return 42;
 }
 ```
+``` bash
+$ echo $?
+42
+```
 #### And we turn that into an ARM Assembly program
 ``` asm
 .section .text                        // Text section for code
@@ -19,6 +23,10 @@ _start:
    mov x0, #42                       // Set x0 to 42
    mov x8, #93                       // Set x8 to 93 (sys_exit syscall number)
    svc 0                             // Make the syscall
+```
+``` bash
+$ echo $?
+42
 ```
 #### After we get the programming environment set up and discuss some theory, that's it for the first hour.
 > |Topics Covered|

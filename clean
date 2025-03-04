@@ -1,13 +1,12 @@
 #!/bin/sh
 
-# List of subdirectories to clean, ignoring .git folder
-SUBDIRS=`find . -type d -not -path '*/.git*'`
+# List of subdirectories to clean, ignoring .git folder and sort them
+SUBDIRS=$(find . -type d -not -path '*/.git*' | sort)
 
+# Iterate over the subdirectories
 for dir in $SUBDIRS; do
-    if [ -d "$dir" ]; then
+	if [ -d "$dir" ] && { [ -f "$dir/Makefile" ] || [ -f "$dir/makefile" ]; }; then
         echo "Cleaning $dir"
-        make -C "$dir" clean
-    else
-        echo "Directory $dir does not exist"
+        make -C "$dir" clean > /dev/null
     fi
 done

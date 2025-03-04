@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<title>5-Hour ARM Assembly Course</title>
+	</head>
+	<body>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+			<defs>
+			  <!-- Background gradient -->
+			  <linearGradient id="bgGradient" x1="0" y1="0" x2="0" y2="1">
+				<stop offset="0%" stop-color="#0a0a0a"/>
+				<stop offset="100%" stop-color="#1a1a1a"/>
+			  </linearGradient>
+			  <style>
+				.title { font: bold 48px monospace; fill: #39FF14; }
+				.subtitle { font: 24px monospace; fill: #FFFFFF; }
+				.code { font: 16px monospace; fill: #CCCCCC; white-space: pre; }
+				.footer { font: bold 28px monospace; fill: #39FF14; }
+				.chip { fill: #333; stroke: #39FF14; stroke-width: 2; }
+			  </style>
+			</defs>
+
+			<!-- Background -->
+			<rect width="1200" height="800" fill="url(#bgGradient)" />
+
+			<!-- Course Title -->
+			<text x="600" y="100" text-anchor="middle" class="title">
+			  5-Hour ARM Assembly Course
+			</text>
+
+			<!-- Course Subtitle -->
+			<text x="600" y="150" text-anchor="middle" class="subtitle">
+			  Build Your Own Assembly Project
+			</text>
+
+			<!-- Code Snippet Box -->
+			<rect x="100" y="200" width="1000" height="250" fill="#222222" stroke="#39FF14" stroke-width="2" rx="10" ry="10"/>
+			<text x="120" y="230" class="code">
+				<pre>
+					// strlen: Calculate length of a null-terminated string
+					//   x1 = address of the string; returns length in x0
+					strlen:
+						prologue
+						mov     x0, #0              // Initialize length counter in x0
+					strlen_loop:
+						ldrb    w2, [x1, x0]        // Load byte at x1 + x0
+						cmp     w2, NULL_TERMINATOR // Compare to null terminator
+						beq     strlen_done         // If found, finish
+						add     x0, x0, #1          // Increment length counter
+						b       strlen_loop
+					strlen_done:
+						epilogue
+						ret                         // Return with length in x0
+				</pre>
+			</text>
+
+			<!-- Description -->
+			<text x="600" y="500" text-anchor="middle" class="subtitle">
+			  Learn low-level programming with hands-on assembly coding.
+			</text>
+			<text x="600" y="540" text-anchor="middle" class="subtitle">
+			  Topics: system calls, sorting algorithms, string manipulation &amp; more.
+			</text>
+
+			<!-- Simple Chip Icon -->
+			<rect x="50" y="600" width="100" height="100" rx="15" ry="15" class="chip" />
+			<line x1="50" y1="650" x2="20" y2="650" stroke="#39FF14" stroke-width="4"/>
+			<line x1="150" y1="650" x2="180" y2="650" stroke="#39FF14" stroke-width="4"/>
+			<line x1="100" y1="600" x2="100" y2="570" stroke="#39FF14" stroke-width="4"/>
+			<line x1="100" y1="700" x2="100" y2="730" stroke="#39FF14" stroke-width="4"/>
+
+			<!-- Call-to-Action Footer -->
+			<text x="600" y="780" text-anchor="middle" class="footer">
+			  Enroll Now and Master Assembly Programming!
+			</text>
+		  </svg>
+	</body>
+</html>

@@ -9,14 +9,18 @@ _start:
     //bl test_print_char
     //bl test_clear_buffer
     //bl test_print_int
-	bl test_print_array
+    //bl test_print_array
+    bl test_sort_array
     b _exit						      // Branch to exit
 
-    ldr x0, =array                    // Load the address of the array into x0
-    mov x1, #10                       // Load the size of the array into x1
-    bl sort                           // Call the sort function
+test_sort_array:
+    prologue
+    ldr x25, =array                   // Load the address of the array into x0
     bl print_array                    // Call the print_array function
-    b _exit                           // Branch to exit
+    bl sort_array                     // Call the sort function
+    bl print_array                    // Call the print_array function
+    epilogue
+    ret
 
 test_clear_buffer:
     prologue
@@ -72,31 +76,28 @@ _exit:
 // Function to sort the array
 //   x0 = address of the array
 //   x1 = size of the array
-sort:
+sort_array:
     prologue
-    mov     x2, #0                // Initialize outer loop index i to 0
+	ldr x0, =array
+	ldr x1, =buffer
+	mov x2, #10
+	bl copy_array
+	ldr x0, =buffer
+	bl print_array
+
+    mov     x26, #0                // Initialize loop index i to 0
+	ldr     x27, =buffer		   // Load the address of the buffer into x22
+	ldr     x28, =buffer		   // Load the address of the buffer into x22
 sort_outer_loop:
-    cmp     x2, x1                // If i >= size, sorting is done
+    cmp     x26, #10               // If i >= size, sorting is done
     b.ge    sort_done
-    add     x3, x2, #1            // Set j = i + 1
-sort_inner_loop:
-    cmp     x3, x1                // If j >= size, break inner loop
-    b.ge    sort_outer_next
-    ldr     w4, [x0, x2, lsl #2]   // Load a[i] into w4
-    ldr     w5, [x0, x3, lsl #2]   // Load a[j] into w5
-    cmp     w4, w5                 // Compare a[i] and a[j]
-    b.le    sort_inner_next        // If a[i] <= a[j] then continue inner loop
-    ;                              // Swap a[i] and a[j]
-    add     x6, x0, x2, lsl #2     // Address of a[i] into x6
-    add     x7, x0, x3, lsl #2     // Address of a[j] into x7
-    mov     x0, x6                 // First swap parameter in x0
-    mov     x1, x7                 // Second swap parameter in x1
-    bl      swap_int               // Call swap_int function
-sort_inner_next:
-    add     x3, x3, #1             // Increment inner loop index j
-    b       sort_inner_loop
-sort_outer_next:
-    add     x2, x2, #1             // Increment outer loop index i
+	ldr     x2, [x27]              // Load array[i] into w2
+	ldr     x3, [x28, x26]         // Load array[i+1] into w3
+	cmp     x2, x3                 // Compare array[i] and array[i+1]
+	b.le    sort_no_swap           // If array[i] <= array[i+1], no swap needed
+	bl      swap_int               // Swap array[i] and array[i+1]
+sort_no_swap:
+    add     x26, x26, #4           // increment index
     b       sort_outer_loop
 sort_done:
     epilogue
@@ -107,10 +108,10 @@ sort_done:
 //   x1 = address of the second integer
 swap_int:
     prologue
-    ldr     w2, [x0]            // Load first integer into w2
-    ldr     w3, [x1]            // Load second integer into w3
-    str     w3, [x0]            // Store second integer at address of first
-    str     w2, [x1]            // Store first integer at address of second
+    ldr     x2, [x19]            // Load first integer into w2
+    ldr     x3, [x20]            // Load second integer into w3
+    str     x3, [x19]            // Store second integer at address of first
+    str     x2, [x20]            // Store first integer at address of second
     epilogue
     ret
 
@@ -225,7 +226,7 @@ strlen_loop:
     b       strlen_loop
 strlen_done:
     epilogue
-    ret                               // Return with length in x0
+    ret                         // Return with length in x0
 
 // clear_buffer: Function to clear the buffer
 // 	 x0 = size of the buffer
@@ -240,6 +241,24 @@ clear_loop:
     sub x0, x0, #1                    // Decrement the size
     b clear_loop                      // Repeat the loop
 clear_done:
+    epilogue
+    ret
+
+// Function: copy_array
+//   x0 = source address (e.g., address of the array)
+//   x1 = destination address (e.g., address of the buffer)
+//   x2 = number of 32-bit words to copy
+copy_array:
+    prologue
+    cmp     x2, #0              // Check if there is anything to copy
+    beq     copy_done           // If x2 is 0, exit the function
+copy_loop:
+    ldr     w3, [x0], #4        // Load a 32-bit word from source and post-increment x0 by 4
+    str     w3, [x1], #4        // Store the 32-bit word into destination and post-increment x1 by 4
+    sub     x2, x2, #1          // Decrement the count
+    cmp     x2, #0              // Check if all words have been copied
+    bne     copy_loop           // If not, continue looping
+copy_done:
     epilogue
     ret
 

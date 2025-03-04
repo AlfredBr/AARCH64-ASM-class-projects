@@ -39,7 +39,7 @@ $ echo $?
 > In `Hour 1` we write Hello, World! in ARM Assembly and introduce loops and function calls.  (Note: we print "Hello, World!" one character at at time.)
 > |Topics Covered|
 > |---|
-> |Loops, Functions, Strings, ASCII, Registers, Branching, Conditionals, Stack, Pointers, Memory, Data Types|
+> |Loops, Functions, Strings, Registers, Branching, Conditionals, Stack, Pointers, Memory, Data Types|
 ### Hour 2 - ABCDEFGHIJKLMNOPQRZTUVWXYZ
 > In `Hour 2` we write a program that prints the alphabet in ARM Assembly.  We also introduce ASCII encoding and the concepts of branching and conditionals.
 > |Topics Covered|

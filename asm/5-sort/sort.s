@@ -272,4 +272,4 @@ _end:
 
 .section .bss                     // Uninitialized data section
     .align 3                      // Align to 8-byte boundary
-    buffer:  .skip 16             // Reserve 16 bytes for integer-to-ASCII conversion
+    buffer: .skip 16              // Reserve 16 bytes for int-to-ASCII conversion

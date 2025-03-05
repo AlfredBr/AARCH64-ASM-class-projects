@@ -87,7 +87,7 @@ reverse_done:
     //add  x1, x1, #1                 // Increment the buffer pointer
     mov  x5, NULL_TERMINATOR          // Null terminator
     strb w5, [x1]                     // Store the null terminator
-    mov  x1, x11					  // Restore the buffer address from x11 to x1
+    mov  x1, x11                      // Restore the buffer address from x11 to x1
     epilogue
     ret
 

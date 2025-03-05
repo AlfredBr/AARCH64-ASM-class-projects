@@ -256,7 +256,7 @@ copy_loop:
     ldr     w3, [x0], #4        // Load a 32-bit word from source
                                 // and post-increment x0 by 4
 	str     w3, [x1], #4        // Store the 32-bit word into destination
-	 // and post-increment x1 by 4
+	                            // and post-increment x1 by 4
     sub     x2, x2, #1          // Decrement the count
     cmp     x2, #0              // Check if all words have been copied
     bne     copy_loop           // If not, continue looping

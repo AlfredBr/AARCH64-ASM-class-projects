@@ -48,25 +48,25 @@ test_print_string:
 
 test_print_char:
     prologue
-	mov x0, 'A'
-	bl print_char
-	mov x0, 'R'
-	bl print_char
-	mov x0, 'M'
-	bl print_char
-	mov x0, #10
-	bl print_char
-	epilogue
-	ret
+    mov x0, 'A'
+    bl print_char
+    mov x0, 'R'
+    bl print_char
+    mov x0, 'M'
+    bl print_char
+    mov x0, #10
+    bl print_char
+    epilogue
+    ret
 
 test_print_int:
-	prologue
-	mov x0, #12345
-	bl print_int
-	mov x0, #10
-	bl print_char
-	epilogue
-	ret
+    prologue
+    mov x0, #12345
+    bl print_int
+    mov x0, #10
+    bl print_char
+    epilogue
+    ret
 
 _exit:
     mov     x0, #0                // Set x0 to 0 (exit status)
@@ -77,31 +77,31 @@ _exit:
 //   x0 = address of the array
 //   x1 = size of the array
 sort_array:
-	prologue
-	ldr x0, =array
-	ldr x1, =buffer
-	mov x2, #10
-	bl copy_array
-	ldr x0, =buffer
-	bl print_array
+    prologue
+    ldr     x0, =array
+    ldr     x1, =buffer
+    mov     x2, #10
+    bl      copy_array
+    ldr     x0, =buffer
+    bl      print_array
 
-	mov     x26, #0                // Initialize loop index i to 0
-	ldr     x27, =buffer           // Load the address of the buffer into x22
-	ldr     x28, =buffer           // Load the address of the buffer into x22
+    mov     x26, #0                // Initialize loop index i to 0
+    ldr     x27, =buffer           // Load the address of the buffer into x22
+    ldr     x28, =buffer           // Load the address of the buffer into x22
 sort_outer_loop:
-	cmp     x26, #10               // If i >= size, sorting is done
-	b.ge    sort_done
-	ldr     x2, [x27]              // Load array[i] into w2
-	ldr     x3, [x28, x26]         // Load array[i+1] into w3
-	cmp     x2, x3                 // Compare array[i] and array[i+1]
-	b.le    sort_no_swap           // If array[i] <= array[i+1], no swap needed
-	bl      swap_int               // Swap array[i] and array[i+1]
+    cmp     x26, #10               // If i >= size, sorting is done
+    b.ge    sort_done
+    ldr     x2, [x27]              // Load array[i] into w2
+    ldr     x3, [x28, x26]         // Load array[i+1] into w3
+    cmp     x2, x3                 // Compare array[i] and array[i+1]
+    b.le    sort_no_swap           // If array[i] <= array[i+1], no swap needed
+    bl      swap_int               // Swap array[i] and array[i+1]
 sort_no_swap:
-	add     x26, x26, #4           // increment index
-	b       sort_outer_loop
+    add     x26, x26, #4           // increment index
+    b       sort_outer_loop
 sort_done:
-	epilogue
-	ret
+    epilogue
+    ret
 
 // swap_int: Swap two integers
 //   x0 = address of the first integer
@@ -149,7 +149,7 @@ print_int:
 //   x1 = address of buffer to store string
 itoa:
     prologue
-    ldr     x1, =buffer		    // x1 = buffer address
+    ldr     x1, =buffer             // x1 = buffer address
     mov     x2, x0              // x2 = integer value
     mov     x3, x1              // x3 = preserve starting buffer address
     mov     x4, #0              // x4 = digit count = 0
@@ -182,7 +182,7 @@ reverse_loop:
 reverse_done:
     mov     x14, NULL_TERMINATOR// Load null terminator
     strb    w14, [x1]           // Store null terminator at buffer end
-    ldr     x1, =buffer		// x1 = buffer address
+    ldr     x1, =buffer         // x1 = buffer address
     epilogue
     ret
 
@@ -233,7 +233,7 @@ strlen_done:
 //   x1 = address of the buffer
 clear_buffer:
     prologue
-    mov     x2, #0                        // Initialize the value to clear with (0)
+    mov     x2, #0              // Initialize the value to clear with (0)
 clear_loop:
     cmp     x0, #0                        // Compare size with 0
     beq     clear_done                    // If size is 0, we're done
@@ -253,8 +253,10 @@ copy_array:
     cmp     x2, #0              // Check if there is anything to copy
     beq     copy_done           // If x2 is 0, exit the function
 copy_loop:
-    ldr     w3, [x0], #4        // Load a 32-bit word from source and post-increment x0 by 4
-    str     w3, [x1], #4        // Store the 32-bit word into destination and post-increment x1 by 4
+    ldr     w3, [x0], #4        // Load a 32-bit word from source
+                                // and post-increment x0 by 4
+	str     w3, [x1], #4        // Store the 32-bit word into destination
+	 // and post-increment x1 by 4
     sub     x2, x2, #1          // Decrement the count
     cmp     x2, #0              // Check if all words have been copied
     bne     copy_loop           // If not, continue looping

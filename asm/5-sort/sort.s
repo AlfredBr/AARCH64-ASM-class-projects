@@ -1,8 +1,8 @@
-.global _start                    // Define the entry point
-.align 2                          // Align to 8-byte boundary
+.global _start                       // Define the entry point
+.align 2                             // Align to 8-byte boundary
 
-.section .text                    // Text section for code
-.include "macros.s"               // Include the macros file
+.section .text                       // Text section for code
+.include "macros.s"                  // Include the macros file
 
 _start:
     //bl test_print_string

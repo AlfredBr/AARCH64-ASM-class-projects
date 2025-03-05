@@ -1,8 +1,8 @@
-.global _start                       // Define the entry point
-.align 2                             // Align to 8-byte boundary
+.global _start                        // Define the entry point
+.align 2                              // Align to 8-byte boundary
 
-.section .text                       // Text section for code
-.include "macros.s"                  // Include the macros file
+.section .text                        // Text section for code
+.include "macros.s"                   // Include the macros file
 
 _start:
     //bl test_print_string
@@ -11,7 +11,7 @@ _start:
     //bl test_print_int
     //bl test_print_array
     bl test_sort_array
-    b _exit						      // Branch to exit
+    b _exit                           // Branch to exit
 
 test_sort_array:
     prologue
@@ -33,21 +33,21 @@ test_clear_buffer:
     ret
 
 test_print_array:
-	prologue
-	ldr x25, =array                   // Load the address of the array into x25
-	bl print_array                    // Call the print_array function
-	epilogue
-	ret
+    prologue
+    ldr x25, =array                   // Load the address of the array into x25
+    bl print_array                    // Call the print_array function
+    epilogue
+    ret
 
 test_print_string:
-	prologue
-	ldr x1, =hello
-	bl print_string
-	epilogue
-	ret
+    prologue
+    ldr x1, =hello
+    bl print_string
+    epilogue
+    ret
 
 test_print_char:
-	prologue
+    prologue
 	mov x0, 'A'
 	bl print_char
 	mov x0, 'R'
@@ -77,7 +77,7 @@ _exit:
 //   x0 = address of the array
 //   x1 = size of the array
 sort_array:
-    prologue
+	prologue
 	ldr x0, =array
 	ldr x1, =buffer
 	mov x2, #10
@@ -85,23 +85,23 @@ sort_array:
 	ldr x0, =buffer
 	bl print_array
 
-    mov     x26, #0                // Initialize loop index i to 0
-	ldr     x27, =buffer		   // Load the address of the buffer into x22
-	ldr     x28, =buffer		   // Load the address of the buffer into x22
+	mov     x26, #0                // Initialize loop index i to 0
+	ldr     x27, =buffer           // Load the address of the buffer into x22
+	ldr     x28, =buffer           // Load the address of the buffer into x22
 sort_outer_loop:
-    cmp     x26, #10               // If i >= size, sorting is done
-    b.ge    sort_done
+	cmp     x26, #10               // If i >= size, sorting is done
+	b.ge    sort_done
 	ldr     x2, [x27]              // Load array[i] into w2
 	ldr     x3, [x28, x26]         // Load array[i+1] into w3
 	cmp     x2, x3                 // Compare array[i] and array[i+1]
 	b.le    sort_no_swap           // If array[i] <= array[i+1], no swap needed
 	bl      swap_int               // Swap array[i] and array[i+1]
 sort_no_swap:
-    add     x26, x26, #4           // increment index
-    b       sort_outer_loop
+	add     x26, x26, #4           // increment index
+	b       sort_outer_loop
 sort_done:
-    epilogue
-    ret
+	epilogue
+	ret
 
 // swap_int: Swap two integers
 //   x0 = address of the first integer
@@ -182,7 +182,7 @@ reverse_loop:
 reverse_done:
     mov     x14, NULL_TERMINATOR// Load null terminator
     strb    w14, [x1]           // Store null terminator at buffer end
-	ldr     x1, =buffer		    // x1 = buffer address
+    ldr     x1, =buffer		// x1 = buffer address
     epilogue
     ret
 
@@ -229,17 +229,17 @@ strlen_done:
     ret                         // Return with length in x0
 
 // clear_buffer: Function to clear the buffer
-// 	 x0 = size of the buffer
+//   x0 = size of the buffer
 //   x1 = address of the buffer
 clear_buffer:
     prologue
-    mov x2, #0                        // Initialize the value to clear with (0)
+    mov     x2, #0                        // Initialize the value to clear with (0)
 clear_loop:
-    cmp x0, #0                        // Compare size with 0
-    beq clear_done                    // If size is 0, we're done
-    strb w2, [x1], #1                 // Store 0 at the buffer address and increment the address
-    sub x0, x0, #1                    // Decrement the size
-    b clear_loop                      // Repeat the loop
+    cmp     x0, #0                        // Compare size with 0
+    beq     clear_done                    // If size is 0, we're done
+    strb    w2, [x1], #1                 // Store 0 at the buffer address and increment the address
+    sub     x0, x0, #1                    // Decrement the size
+    b       clear_loop                      // Repeat the loop
 clear_done:
     epilogue
     ret
@@ -264,8 +264,8 @@ copy_done:
 
 _end:
 
-.section .data                    // Data section for constants
-	hello: .asciz "Hello, World!\n"   // Define a null-terminated string
+.section .data                                  // Data section for constants
+    hello: .asciz "Hello, World!\n"             // Define a null-terminated string
     array: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0   // The unsorted array
 
 .section .bss                     // Uninitialized data section

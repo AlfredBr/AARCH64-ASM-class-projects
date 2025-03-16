@@ -49,9 +49,9 @@ $ echo $?
 > In `Hour 3` we write a program that prints the numbers 0 to 99 in ARM Assembly.  Here we discuss the difference between the value of a number and the printed representation of a number.
 ### Hour 4 - FizzBuzz
 > In `Hour 4` we write a program that implements the famous FizzBuzz algorithm for values from 1 to 100.  This lesson is a bit more challenging than the previous lessons, but it is a great way to learn about branching and conditionals.
-### Hour 5 - Sorting
+### Hour 5 - Sorting (asm example not yet working)
 > In `Hour 5` we write a program that sorts and prints an array of integers in ARM Assembly.  This one is challenging!
-### Hour 6 - Leap Year
+### Hour 6 - Leap Year (asm example not yet working)
 > Coming soon!  In `Hour 6` we write an ARM assembler program that takes a year as text input from the command line and responds whether or not that year is a leap year.
 # Useful Links
 - [ARM Assembly Language Reference](https://developer.arm.com/documentation/100076/0100)

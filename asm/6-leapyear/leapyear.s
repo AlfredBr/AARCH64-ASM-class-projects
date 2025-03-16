@@ -1,27 +1,30 @@
-.section .text
 .global _start
 .align 2
 
-_start:
-    // On Linux AArch64: x0 = argc, x1 = argv pointer array
-    cmp     x0, #2
-    beq     parse_year
-    // argc != 2: print usage message to stderr (fd 2)
-    ldr     x1, =usage_msg
-    mov     x0, #2          // stderr FD
-    mov     x2, #23         // usage message length
-    mov     x8, #64         // sys_write
-    svc     0
-    // exit with failure code 1
-    mov     x0, #1
-    mov     x8, #93         // sys_exit
-    svc     0
+.section .text
+.include "macros.s"                   // Include the macros file
 
-parse_year:
-    // Get argv[1]
-    ldr     x1, [x1, #8]    // pointer to second argument
-    bl      atoi            // result in x0
-    mov     x19, x0         // store year in x19
+_start:
+	// Prompt user for input
+	ldr x1, =prompt      // load address of prompt into x1
+	bl print_string      // call print_string to print the prompt
+	// Read input from user
+    mov x0, #0           // file descriptor 0 (stdin)
+    mov x8, #63          // syscall number 63 (read)
+    ldr x1, =buffer      // buffer
+    mov x2, #100         // max bytes to read
+	svc #0               // syscall
+    // Check if input is empty
+	ldr x1, =buffer      // load address of buffer into x1
+	bl strlen            // x0 = length of string
+	cmp x0, #1           // compare length to #1 (i.e just a newline)
+	bgt convert_input_to_year
+	b print_usage_and_exit // if just a newline, print usage message and exit
+
+convert_input_to_year:
+	ldr x1, =buffer      // load address of buffer into x1
+    bl      atoi         // convertsion result in x0
+    mov     x19, x0      // store year in x19
 
     // Test leap: if (year %4==0) then check (year%100 !=0) OR (year %400==0)
     // Compute year % 4
@@ -53,7 +56,6 @@ parse_year:
     b       not_leap
 
 leap_true:
-    // Print "✅ " then year then " is a leap year\n"
     ldr     x1, =leap_prefix
     bl      print_string
     mov     x0, x19
@@ -64,7 +66,6 @@ leap_true:
     b       exit_success
 
 not_leap:
-    // Print "🛑 " then year then " is NOT a leap year\n"
     ldr     x1, =not_leap_prefix
     bl      print_string
     mov     x0, x19
@@ -158,7 +159,34 @@ ps_call:
     svc     0
     ret
 
+// strlen: Calculate length of a null-terminated string
+//   x1 = address of the string; returns length in x0
+strlen:
+    prologue
+    mov     x0, #0              // Initialize length counter in x0
+strlen_loop:
+    ldrb    w2, [x1, x0]        // Load byte at x1 + x0
+    cmp     w2, NULL_TERMINATOR // Compare to null terminator
+    beq     strlen_done         // If found, finish
+    add     x0, x0, #1          // Increment length counter
+    b       strlen_loop
+strlen_done:
+    epilogue
+    ret                         // Return with length in x0
+
+print_usage_and_exit:
+    ldr     x1, =usage_msg
+    mov     x0, #2          // stderr FD
+    mov     x2, #23         // usage message length
+    mov     x8, #64         // sys_write
+    svc     0
+    // exit with failure code 1
+    mov     x0, #1
+    mov     x8, #93         // sys_exit
+    svc     0
+
 .section .data
+prompt:           .asciz "Enter a year: "
 leap_prefix:      .asciz "✅ "
 leap_suffix:      .asciz " is a leap year\n"
 not_leap_prefix:  .asciz "🛑 "

@@ -2,7 +2,7 @@
 .align 2
 
 .section .text
-.include "macros.s"                   // Include the macros file
+.include "macros.s"      // Include the macros file
 
 _start:
 	// Prompt user for input
@@ -14,7 +14,7 @@ _start:
     ldr x1, =buffer      // buffer
     mov x2, #100         // max bytes to read
 	svc #0               // syscall
-    // Check if input is empty
+    // Check if input is valid
 	ldr x1, =buffer      // load address of buffer into x1
 	bl strlen            // x0 = length of string
 	cmp x0, #1           // compare length to #1 (i.e just a newline)
@@ -23,9 +23,8 @@ _start:
 
 convert_input_to_year:
 	ldr x1, =buffer      // load address of buffer into x1
-    bl      atoi         // convertsion result in x0
+    bl      atoi         // atoi conversion store result in x0
     mov     x19, x0      // store year in x19
-
     // Test leap: if (year %4==0) then check (year%100 !=0) OR (year %400==0)
     // Compute year % 4
     mov     x2, x19
@@ -59,8 +58,8 @@ leap_true:
     ldr     x1, =leap_prefix
     bl      print_string
     mov     x0, x19
-    bl      itoa            // itoa returns string in buffer_rev
-    bl      print_string
+    //bl      itoa            // itoa returns string in buffer_rev
+    //bl      print_string
     ldr     x1, =leap_suffix
     bl      print_string
     b       exit_success
@@ -69,8 +68,8 @@ not_leap:
     ldr     x1, =not_leap_prefix
     bl      print_string
     mov     x0, x19
-    bl      itoa
-    bl      print_string
+    //bl      itoa
+    //bl      print_string
     ldr     x1, =not_leap_suffix
     bl      print_string
 

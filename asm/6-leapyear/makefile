@@ -1,6 +1,7 @@
 ASM = as
 LD = ld
 TARGET = leapyear
+CC = gcc
 
 all: $(TARGET)
 
@@ -8,7 +9,7 @@ all: $(TARGET)
 	$(ASM) -g -o $@ $<
 
 $(TARGET): $(TARGET).o
-	$(LD) -g -o $@ $<
+	$(CC) -nostartfiles -g -o $@ $<
 
 clean:
 	@rm -f $(TARGET) a.out *.o *.disasm

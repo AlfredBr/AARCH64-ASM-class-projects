@@ -48,9 +48,9 @@ $ echo $?
 ### Hour 3 - 0 -> 99
 > In `Hour 3` we write a program that prints the numbers 0 to 99 in ARM Assembly.  Here we discuss the difference between the value of a number and the printed representation of a number.
 ### Hour 4 - FizzBuzz
-> In `Hour 4` we write a program that implements the famous FizzBuzz algorithm for values from 0 to 99.  This lesson is a bit more challenging than the previous lessons, but it is a great way to learn about branching and conditionals.
-### Bonus 5 - Sorting
-> In the `bonus hour` we write a program that sorts and prints an array of integers in ARM Assembly.  This one is challenging!
+> In `Hour 4` we write a program that implements the famous FizzBuzz algorithm for values from 1 to 100.  This lesson is a bit more challenging than the previous lessons, but it is a great way to learn about branching and conditionals.
+### Hour 5 - Sorting
+> In the `Hour 5` we write a program that sorts and prints an array of integers in ARM Assembly.  This one is challenging!
 
 # Useful Links
 - [ARM Assembly Language Reference](https://developer.arm.com/documentation/100076/0100)

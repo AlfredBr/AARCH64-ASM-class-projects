@@ -51,8 +51,8 @@ $ echo $?
 > In `Hour 4` we write a program that implements the famous FizzBuzz algorithm for values from 1 to 100.  This lesson is a bit more challenging than the previous lessons, but it is a great way to learn about branching and conditionals.
 ### Hour 5 - Sorting (asm example not yet working)
 > In `Hour 5` we write a program that sorts and prints an array of integers in ARM Assembly.  This one is challenging!
-### Hour 6 - Leap Year (asm example not yet working)
-> Coming soon!  In `Hour 6` we write an ARM assembler program that takes a year as text input from the command line and responds whether or not that year is a leap year.
+### Hour 6 - Leap Year
+> In `Hour 6` we write an ARM assembler program that takes a year as text input from stdin and responds whether or not that year is a leap year.
 # Useful Links
 - [ARM Assembly Language Reference](https://developer.arm.com/documentation/100076/0100)
 - [LINUX SysCall info](https://arm64.syscall.sh/)

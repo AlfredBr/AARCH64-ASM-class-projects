@@ -46,7 +46,7 @@ $ echo $?
 > |---|
 > |Branching, Conditionals, Loops, Strings, ASCII, Data Types|
 ### Hour 3 - 0 -> 99
-> In `Hour 3` we write a program that prints the numbers 0 to 99 in ARM Assembly.  Here we discuss the difference between the value of a number and the printed representation of a number.
+> In `Hour 3` we write a program that prints the numbers 0 to 99 in ARM Assembly.  Here we discuss the difference between the integer value of a number and the printed representation of a number as an ASCII string.
 ### Hour 4 - FizzBuzz
 > In `Hour 4` we write a program that implements the famous FizzBuzz algorithm for values from 1 to 100.  This lesson is a bit more challenging than the previous lessons, but it is a great way to learn about branching and conditionals.
 ### Hour 5 - Sorting (asm example not yet working)

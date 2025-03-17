@@ -78,6 +78,7 @@ exit_success:
 
 // atoi: convert null-terminated string (in x1) to integer (returned in x0)
 atoi:
+	prologue
     mov     x0, #0              // accumulator = 0
 atoi_loop:
     ldrb    w2, [x1], #1
@@ -94,11 +95,13 @@ atoi_loop:
     add     x0, x0, w2, uxtw   // add digit (extended to 64-bit)
     b       atoi_loop
 atoi_done:
+	epilogue
     ret
 
 // itoa: convert integer in x0 to a null-terminated ASCII string.
 // The result is built in buffer_rev and pointer is returned in x1.
 itoa:
+	prologue
     ldr     x1, =buffer         // working buffer (unused)
     mov     x2, x0              // number to convert
     cmp     x2, #0
@@ -136,10 +139,12 @@ itoa_finish:
     mov     w9, #0
     strb    w9, [x7]           // null-terminate string
     ldr     x1, =buffer_rev
+	epilogue
     ret
 
 // print_string: prints a null-terminated string pointed by x1 to stdout.
 print_string:
+	prologue
     mov     x2, #0             // initialize length counter
 print_string_loop:
     ldrb    w3, [x1, x2]
@@ -151,6 +156,7 @@ ps_call:
     mov     x0, #1             // FD 1 (stdout)
     mov     x8, #64            // syscall: write
     svc     #0
+	epilogue
     ret
 
 // strlen: calculates the length of a null-terminated string (input: x1; output: x0)

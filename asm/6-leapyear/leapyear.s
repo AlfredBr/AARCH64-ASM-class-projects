@@ -58,8 +58,8 @@ leap_true:
     ldr     x1, =leap_prefix
     bl      print_string
     mov     x0, x19
-    //bl      itoa            // itoa returns string in buffer_rev
-    //bl      print_string
+    bl      itoa            // itoa returns string in buffer_rev
+    bl      print_string
     ldr     x1, =leap_suffix
     bl      print_string
     b       exit_success
@@ -68,8 +68,8 @@ not_leap:
     ldr     x1, =not_leap_prefix
     bl      print_string
     mov     x0, x19
-    //bl      itoa
-    //bl      print_string
+    bl      itoa
+    bl      print_string
     ldr     x1, =not_leap_suffix
     bl      print_string
 
@@ -125,16 +125,18 @@ itoa_loop:
     mov     x2, x4
     cmp     x2, #0
     bne     itoa_loop
-    // x3 now points past the last digit in temp buffer; reverse the string into buffer_rev.
-    sub     x3, x3, #1      // point to last digit
-    ldr     x10, =buffer_temp // Load the address of buffer_temp into x10
-    cmp     x3, x10           // Compare x3 with x10
-itoa_copy_loop:
-    blt     itoa_finish
-    ldrb    w8, [x3]
-    strb    w8, [x7], #1
-    subs    x3, x3, #1
-    b       itoa_copy_loop
+    // x3 now points past the last digit in buffer_temp.
+    ldr     x10, =buffer_temp   // pointer to the beginning of buffer_temp
+    sub     x11, x3, x10         // x11 = number of digits stored
+    ldr     x7, =buffer_rev       // initialize destination pointer
+copy_loop:
+    cmp     x11, #0             // if count is 0, all digits have been copied
+    beq     itoa_finish
+    sub     x11, x11, #1        // decrement digit count
+    add     x12, x10, x11       // compute address of the current digit
+    ldrb    w8, [x12]           // load digit
+    strb    w8, [x7], #1        // store digit and post-increment destination pointer
+    b       copy_loop
 itoa_finish:
     // Null-terminate the reversed string.
     mov     w9, #0

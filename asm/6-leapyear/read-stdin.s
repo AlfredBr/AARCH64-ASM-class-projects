@@ -5,6 +5,7 @@
 .include "macros.s"     // Include the macros file
 
 _start:
+    // demonstration - read from stdin and write to stdout
     mov x0, #0          // file descriptor 0 (stdin)
     mov x8, #63         // syscall number 63 (read)
     ldr x1, =buffer     // buffer
@@ -22,4 +23,4 @@ _start:
     svc #0              // syscall
 
 .section .bss
-buffer: .skip 100
+buffer: .skip 32

@@ -89,12 +89,12 @@ atoi_loop:
     blt     atoi_loop
     cmp     w2, #'9'
     bgt     atoi_loop
-    // x0 = x0 *10 + (w2 - '0')
-    mov     x9, #10           // Load constant 10 into x9
-    mul     x0, x0, x9        // Multiply x0 by x9
-    mov     w8, #48           // Load constant 48 into w8
-    sub     w2, w2, w8        // Subtract 48 from w2 (result in w2)
-    add     x0, x0, x2
+    // Compute: x0 = x0 * 10 + (w2 - '0')
+    mov     x9, #10
+    mul     x0, x0, x9
+    mov     w8, #48
+    sub     w2, w2, w8
+    add     x0, x0, w2, uxtw    // fixed: explicitly extend w2 to 64-bit
     b       atoi_loop
 atoi_done:
     ret
@@ -104,8 +104,7 @@ atoi_done:
 // Returns pointer in x1 (points to buffer_rev).
 itoa:
     ldr     x1, =buffer      // working buffer (unused final result)
-    mov     x2, x0         // copy number to x2
-    // Special case for 0
+    mov     x2, x0           // number to convert in x2
     cmp     x2, #0
     bne     itoa_convert
     ldr     x3, =buffer_rev
@@ -113,34 +112,33 @@ itoa:
     strb    w9, [x3], #1
     b       itoa_finish
 itoa_convert:
-    // Use buffer_temp to store digits in reverse order.
+    // Build reversed number string in buffer_temp.
     ldr     x3, =buffer_temp
 itoa_loop:
-    mov     x9, #10           // Ensure x9 has constant 10
-    udiv    x4, x2, x9        // Divide x2 by x9
-    mul     x5, x4, x9        // Multiply x4 by x9
-    sub     x6, x2, x5      // remainder = x2 - (quotient*10)
+    mov     x9, #10
+    udiv    x4, x2, x9       // quotient in x4
+    mul     x5, x4, x9
+    sub     x6, x2, x5       // remainder in x6
     add     x6, x6, #'0'
-    strb    w6, [x3], #1
+    strb    w6, [x3], #1     // store digit in buffer_temp (post-increment)
     mov     x2, x4
     cmp     x2, #0
     bne     itoa_loop
-    // x3 now points past the last digit in buffer_temp.
-    ldr     x10, =buffer_temp   // pointer to the beginning of buffer_temp
-    sub     x11, x3, x10         // x11 = number of digits stored
-    ldr     x7, =buffer_rev       // initialize destination pointer
+    // Calculate number of digits stored.
+    ldr     x10, =buffer_temp
+    sub     x11, x3, x10     // x11 = digit count
+    ldr     x7, =buffer_rev  // destination pointer for final string
 copy_loop:
-    cmp     x11, #0             // if count is 0, all digits have been copied
+    cmp     x11, #0         // done when count is zero
     beq     itoa_finish
-    sub     x11, x11, #1        // decrement digit count
-    add     x12, x10, x11       // compute address of the current digit
-    ldrb    w8, [x12]           // load digit
-    strb    w8, [x7], #1        // store digit and post-increment destination pointer
+    sub     x11, x11, #1    // decrement counter
+    add     x12, x10, x11   // address of current digit in buffer_temp
+    ldrb    w8, [x12]       // load digit
+    strb    w8, [x7], #1    // store digit in buffer_rev and post-increment
     b       copy_loop
 itoa_finish:
-    // Null-terminate the reversed string.
     mov     w9, #0
-    strb    w9, [x7]
+    strb    w9, [x7]        // null-terminate the string
     ldr     x1, =buffer_rev
     ret
 
@@ -164,16 +162,16 @@ ps_call:
 //   x1 = address of the string; returns length in x0
 strlen:
     prologue
-    mov     x0, #0              // Initialize length counter in x0
+    mov     x0, #0          // length counter
 strlen_loop:
-    ldrb    w2, [x1, x0]        // Load byte at x1 + x0
-    cmp     w2, NULL_TERMINATOR // Compare to null terminator
-    beq     strlen_done         // If found, finish
-    add     x0, x0, #1          // Increment length counter
+    ldrb    w2, [x1, x0]
+    cmp     w2, #0          // compare with null terminator (0)
+    beq     strlen_done
+    add     x0, x0, #1
     b       strlen_loop
 strlen_done:
     epilogue
-    ret                         // Return with length in x0
+    ret
 
 print_usage_and_exit:
     ldr     x1, =usage_msg

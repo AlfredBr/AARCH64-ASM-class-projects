@@ -5,66 +5,41 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
-    //bl test_print_string
-    //bl test_print_char
-    //bl test_clear_buffer
-    //bl test_print_int
-    //bl test_print_array
-    bl test_sort_array
-    b _exit                           // Branch to exit
+    ldr x0, =array1                  // Load the address of the array into x0
+    mov x1, #10					     // Load the size of the array into x1
+    bl print_array                   // Call the print_array function
+    ldr x0, =array1                  // Load the address of the array into x0
+    ldr x1, =buffer                  // Load the address of the buffer into x1
+    mov x2, #10					     // Load the size of the array into x2
+    bl copy_array                    // Call the copy_array function
+    ldr x0, =buffer                  // Load the address of the buffer into x0
+    mov x1, #10					     // Load the size of the array into x1
+    bl print_array                   // Call the print_array function
+here:
+    bl print_array
 
-test_sort_array:
-    prologue
-    ldr x25, =array                   // Load the address of the array into x0
-    bl print_array                    // Call the print_array function
-    bl sort_array                     // Call the sort function
-    bl print_array                    // Call the print_array function
-    epilogue
-    ret
+    b _exit
 
-test_clear_buffer:
-    prologue
-    mov x0, #16                       // Load the size of the buffer into x0
-    ldr x1, =buffer                   // Load the address of the buffer into x1
-    bl clear_buffer                   // Call the clear_buffer function
-    ldr x1, =buffer                   // Load the address of the buffer into x1
-    bl print_string                   // Call the print_string function
-    epilogue
-    ret
+    ldr x0, =array2                  // Load the address of the array into x0
+    mov x1, #6					     // Load the size of the array into x1
+    bl print_array                   // Call the print_array function
+    ldr x0, =array2				     // Load the size of the array into x1
+    ldr x1, =buffer				     // Load the address of the array into x0
+    mov x2, #6
+    bl copy_array
+    ldr x0, =buffer
+    mov x1, #6
+    bl print_array                   // Call the print_array function
 
-test_print_array:
-    prologue
-    ldr x25, =array                   // Load the address of the array into x25
-    bl print_array                    // Call the print_array function
-    epilogue
-    ret
+	b _exit
 
-test_print_string:
-    prologue
-    ldr x1, =hello
-    bl print_string
-    epilogue
-    ret
+	ldr x0, =array2				     // Load the address of the array into x0
+	mov x1, #6					     // Load the size of the array into x1
+	bl sort_array                    // Call the sort function
+	bl print_array                   // Call the print_array function
 
-test_print_char:
-    prologue
-    mov x0, 'A'
-    bl print_char
-    mov x0, 'R'
-    bl print_char
-    mov x0, 'M'
-    bl print_char
-    mov x0, #10
-    bl print_char
-    epilogue
-    ret
-
-test_print_int:
-    prologue
-    mov x0, #12345
-    bl print_int
-    mov x0, #10
-    bl print_char
+    //bl sort_array                  // Call the sort function
+    bl print_array                   // Call the print_array function
     epilogue
     ret
 
@@ -78,7 +53,7 @@ _exit:
 //   x1 = size of the array
 sort_array:
     prologue
-    ldr     x0, =array
+    ldr     x0, =array1
     ldr     x1, =buffer
     mov     x2, #10
     bl      copy_array
@@ -117,21 +92,36 @@ swap_int:
 
 // print_array: Print the integer array
 //   x0 = address of the array
+//   x1 = length of array
 print_array:
     prologue
-    mov     x23, #0               // Initialize index to 0
+	push    x0, x1                // x0 = addr of array, x1 = length of array
+	push    x2, x3                // x2 = loop index, x3 = array offset
+	push    x4, x5                // x4 = current item, x5 = ???
+    mov     x2, #0                // Initialize index to 0
+	mov     x3, #0                // Initialize offset to 0
 print_loop:
-    cmp     x23, #40              // If index >= size, done
+    ldr     x4, [x0, x3]          // Load array element into w4
+	push    x0, x1
+	push    x2, x3
+	mov     w0, w4                // load the integer into w0
+    bl      print_int			  // Print the integer at x0
+    mov     w0, SPACE             // Load SPACE character into w0
+    bl      print_char            // Print the character at x0
+	pop     x2, x3
+	pop     x0, x1
+    add     x2, x2, #1 		      // Increment index
+	add     x3, x3, #4            // Increment offset
+    cmp     x2, x1                // If index >= size, we are done
     b.ge    print_done
-    ldr     w0, [x23, x25]        // Load array element into w2
-    bl      print_int             // Print the integer
-    mov     x0, SPACE             // Load space character
-    bl      print_char            // Print the newline
-    add     x23, x23, #4          // Increment index
-    b       print_loop
+    b       print_loop            // Otherwise, continue looping
 print_done:
-    mov     x0, NEWLINE           // Load newline character
+    mov     w0, NEWLINE           // Load newline character
+here2:
     bl      print_char            // Print the newline
+	pop     x4, x5
+	pop     x2, x3
+	pop     x0, x1
     epilogue
     ret
 
@@ -141,6 +131,37 @@ print_int:
     prologue
     bl      itoa                // Convert integer (x0) to ASCII in buffer at sp
     bl      print_string        // Print the string at x1 (buffer)
+	epilogue
+    ret
+
+// print_char: Print a single character
+//   x0 = character to print
+print_char:
+    prologue
+	push x0, x1
+	push x2, x3
+    strb    w0, [sp, #-1]!      // Push character onto stack
+    mov     x1, sp              // Set x1 to address of the character
+    mov     x2, #1              // Length = 1 for one character
+    mov     x8, #64             // Syscall number for write
+    mov     x0, #1              // File descriptor stdout
+    svc     0                   // Make syscall
+    add     sp, sp, #1          // Pop the character from the stack
+	pop x2, x3
+	pop x0, x1
+    epilogue
+    ret
+
+// print_string: Print a null-terminated string
+//   x1 = address of the string
+//   x2 = length (returned by strlen)
+print_string:
+    prologue
+    bl      strlen              // x0 = length of string at x1
+    mov     x2, x0              // Copy length into x2
+    mov     x0, #1              // File descriptor stdout
+    mov     x8, #64             // Syscall number for write
+    svc     0                   // Make syscall
     epilogue
     ret
 
@@ -186,33 +207,6 @@ reverse_done:
     epilogue
     ret
 
-// print_char: Print a single character
-//   x0 = character to print
-print_char:
-    prologue
-    strb    w0, [sp, #-1]!      // Push character onto stack
-    mov     x1, sp              // Set x1 to address of the character
-    mov     x2, #1              // Length = 1 for one character
-    mov     x8, #64             // Syscall number for write
-    mov     x0, #1              // File descriptor stdout
-    svc     0                   // Make syscall
-    add     sp, sp, #1          // Pop the character from the stack
-    epilogue
-    ret
-
-// print_string: Print a null-terminated string
-//   x1 = address of the string
-//   x2 = length (returned by strlen)
-print_string:
-    prologue
-    bl      strlen              // x0 = length of string at x1
-    mov     x2, x0              // Copy length into x2
-    mov     x0, #1              // File descriptor stdout
-    mov     x8, #64             // Syscall number for write
-    svc     0                   // Make syscall
-    epilogue
-    ret
-
 // strlen: Calculate length of a null-terminated string
 //   x1 = address of the string; returns length in x0
 strlen:
@@ -229,18 +223,22 @@ strlen_done:
     ret                         // Return with length in x0
 
 // clear_buffer: Function to clear the buffer
-//   x0 = size of the buffer
-//   x1 = address of the buffer
+//   x0 = address of the buffer
+//   x1 = size of the buffer
 clear_buffer:
     prologue
+	push x0, x1
+	push x2, x3
     mov     x2, #0              // Initialize the value to clear with (0)
 clear_loop:
-    cmp     x0, #0                        // Compare size with 0
+    cmp     x1, #0                        // Compare size with 0
     beq     clear_done                    // If size is 0, we're done
-    strb    w2, [x1], #1                 // Store 0 at the buffer address and increment the address
-    sub     x0, x0, #1                    // Decrement the size
+    strb    w0, [x1], #0                 // Store 0 at the buffer address and increment the address
+    sub     x1, x1, #1                    // Decrement the size
     b       clear_loop                      // Repeat the loop
 clear_done:
+	pop x2, x3
+	pop x0, x1
     epilogue
     ret
 
@@ -250,6 +248,8 @@ clear_done:
 //   x2 = number of 32-bit words to copy
 copy_array:
     prologue
+	push x0, x1
+	push x2, x3
     cmp     x2, #0              // Check if there is anything to copy
     beq     copy_done           // If x2 is 0, exit the function
 copy_loop:
@@ -261,14 +261,18 @@ copy_loop:
     cmp     x2, #0              // Check if all words have been copied
     bne     copy_loop           // If not, continue looping
 copy_done:
+	pop x2, x3
+	pop x0, x1
     epilogue
     ret
+
 
 _end:
 
 .section .data                                  // Data section for constants
     hello: .asciz "Hello, World!\n"             // Define a null-terminated string
-    array: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0   // The unsorted array
+    array1: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0  // The unsorted array
+    array2: .word 51, 14, 31, 2, 11, 16         // The unsorted array
 
 .section .bss                     // Uninitialized data section
     .align 3                      // Align to 8-byte boundary

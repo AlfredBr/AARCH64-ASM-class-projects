@@ -1,3 +1,4 @@
-//*.o
-//.gdb_history
+*.o
+*.orig
+.gdb_history
 scratchpad

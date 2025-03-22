@@ -21,3 +21,9 @@ debug: $(TARGET)
 
 disasm:
 	objdump -d $(TARGET) > $(TARGET).disasm
+
+git:
+	make clean
+	git add -A
+	git commit -m "Update"
+	git push

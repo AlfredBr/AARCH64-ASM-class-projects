@@ -5,31 +5,65 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
+    // (a) print the original array1 of single digit integers
+    mov   x0, 'a'                     // Load the character 'a' into x1
+    bl    print_char                  // Call the print_char function
+    mov   x0, SPACE                   // Load the SPACE character into x0
+    bl    print_char                  // Call the print_char function
+    ldr   x0, =array1                 // Load the address of the array into x0
+    mov   x1, #10                     // Load the size of the array into x1
+    bl    print_array                 // Call the print_array function
+    // (b) copy from array1 into buffer and print the buffer
+    mov   x0, 'b'                     // Load the character 'a' into x1
+    bl    print_char                  // Call the print_char function
+    mov   x0, SPACE                   // Load the SPACE character into x0
+    bl    print_char                  // Call the print_char function
+    ldr   x0, =array1                 // Load the address of the array into x0
+    ldr   x1, =buffer                 // Load the address of the buffer into x1
+    mov   x2, #10                     // Load the size of the array into x2
+    bl    copy_array                  // Call the copy_array function
+    ldr   x0, =buffer                 // Load the address of the buffer into x0
+    mov   x1, #10                     // Load the size of the array into x1
+    bl    print_array                 // Call the print_array function
+    // (c) print the original array2 of multi digit integers
+    mov   x0, 'c'                     // Load the character 'a' into x1
+    bl    print_char                  // Call the print_char function
+    mov   x0, SPACE                   // Load the SPACE character into x0
+    bl    print_char                  // Call the print_char function
+    ldr   x0, =array2                 // Load the address of the array into x0
+    mov   x1, #6                      // Load the size of the array into x1
+    bl    print_array                 // Call the print_array function
+    // (d) copy from array2 into buffer and print the buffer
+    mov   x0, 'd'                     // Load the character 'a' into x1
+    bl    print_char                  // Call the print_char function
+    mov   x0, SPACE                   // Load the SPACE character into x0
+    bl    print_char                  // Call the print_char function
+    ldr   x0, =array2                 // Load the address of the array into x0
+    ldr   x1, =buffer                 // Load the address of the buffer into x1
+    mov   x2, #6                      // Load the size of the array into x2
+    bl    copy_array                  // Call the copy_array function
+    ldr   x0, =buffer                 // Load the address of the buffer into x0
+    mov   x1, #6                      // Load the size of the array into x1
+    bl    print_array                 // Call the print_array function
 
-    ldr   x0, =array1                 // Load the address of the array into x0
-    mov   x1, #10                     // Load the size of the array into x1
-    bl    print_array                 // Call the print_array function
-    ldr   x0, =array1                 // Load the address of the array into x0
-    ldr   x1, =buffer                 // Load the address of the buffer into x1
-    mov   x2, #10                     // Load the size of the array into x2
-    bl    copy_array                  // Call the copy_array function
-    ldr   x0, =buffer                 // Load the address of the buffer into x0
-    mov   x1, #10                     // Load the size of the array into x1
-    bl    print_array                 // Call the print_array function
-    // sort
-    ldr   x0, =array1                 // Load the address of the array into x0
-    ldr   x1, =buffer                 // Load the address of the buffer into x1
-    mov   x2, #10                     // Load the size of the array into x2
-    bl    copy_array                  // Call the copy_array function
-    ldr   x0, =buffer                 // Load the address of the buffer into x0
-    mov   x1, #10                     // Load the size of the array into x1
+    b     exit
+
+    //
+    // sort - copy from array1 into buffer
+    //
+    //ldr   x0, =array1                 // Load the address of the array into x0
+    //ldr   x1, =buffer                 // Load the address of the buffer into x1
+    //mov   x2, #10                     // Load the size of the array into x2
+    //bl    copy_array                  // Call the copy_array function
+    //ldr   x0, =buffer                 // Load the address of the buffer into x0
+    //mov   x1, #10                     // Load the size of the array into x1
+
 sort:
     bl    sort_array                  // Call the sort_array function
     ldr   x0, =buffer                 // Load the address of the buffer into x0
     mov   x1, #10                     // Load the size of the array into x1
     bl    print_array                 // Call the print_array function
-    b     _exit
-
+    b     exit
 
     ldr   x0, =array2                 // Load the address of the array into x0
     mov   x1, #6                      // Load the size of the array into x1
@@ -42,7 +76,7 @@ sort:
     mov   x1, #6
     bl    print_array                 // Call the print_array function
 
-    b     _exit
+    b     exit
 
     ldr   x0, =array2                 // Load the address of the array into x0
     mov   x1, #6                      // Load the size of the array into x1
@@ -54,7 +88,7 @@ sort:
     epilogue
     ret
 
-_exit:
+exit:
     mov     x0, #0                    // Set x0 to 0 (exit status)
     mov     x8, #93                   // Syscall: exit (93)
     svc     0                         // Make the syscall

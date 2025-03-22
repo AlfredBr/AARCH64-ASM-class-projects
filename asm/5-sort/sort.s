@@ -45,19 +45,14 @@ _start:
     ldr   x0, =buffer                 // Load the address of the buffer into x0
     mov   x1, #6                      // Load the size of the array into x1
     bl    print_array                 // Call the print_array function
-
-    b     exit
-
-    //
-    // sort - copy from array1 into buffer
-    //
-    //ldr   x0, =array1                 // Load the address of the array into x0
-    //ldr   x1, =buffer                 // Load the address of the buffer into x1
-    //mov   x2, #10                     // Load the size of the array into x2
-    //bl    copy_array                  // Call the copy_array function
-    //ldr   x0, =buffer                 // Load the address of the buffer into x0
-    //mov   x1, #10                     // Load the size of the array into x1
-
+    // sort the single digit integers - copy from array1 into buffer
+    ldr   x0, =array1                 // Load the address of the array into x0
+    ldr   x1, =buffer                 // Load the address of the buffer into x1
+    mov   x2, #10                     // Load the size of the array into x2
+    bl    copy_array                  // Call the copy_array function
+    ldr   x0, =buffer                 // Load the address of the buffer into x0
+    mov   x1, #10                     // Load the size of the array into x1
+    b exit
 sort:
     bl    sort_array                  // Call the sort_array function
     ldr   x0, =buffer                 // Load the address of the buffer into x0

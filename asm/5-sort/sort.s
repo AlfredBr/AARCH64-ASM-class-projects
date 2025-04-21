@@ -5,6 +5,7 @@
 .include "macros.s"                   // Include the macros file
 
 _start:
+    b     load
     // (a) print the original array1 of single digit integers
     mov   x0, 'a'                     // Load the character 'a' into x1
     bl    print_char                  // Call the print_char function
@@ -45,88 +46,33 @@ _start:
     ldr   x0, =buffer                 // Load the address of the buffer into x0
     mov   x1, #6                      // Load the size of the array into x1
     bl    print_array                 // Call the print_array function
-    // sort the single digit integers - copy from array1 into buffer
-    ldr   x0, =array1                 // Load the address of the array into x0
-    ldr   x1, =buffer                 // Load the address of the buffer into x1
-    mov   x2, #10                     // Load the size of the array into x2
-    bl    copy_array                  // Call the copy_array function
-    ldr   x0, =buffer                 // Load the address of the buffer into x0
-    mov   x1, #10                     // Load the size of the array into x1
-    b exit
+load:
+    // Copy array1 into buffer
+    ldr   x0, =array1                 // x0 = source
+    ldr   x1, =buffer                 // x1 = dest
+    mov   x2, #10                     // x2 = count
+    bl    copy_array
+    // Print the initial unsorted array
+    ldr   x0, =buffer                 // x0 = array address
+    mov   x1, #10                     // x1 = array size
+    bl    print_array
+    // Sort buffer and print after every comparison
+    ldr   x0, =buffer                 // x0 = array address
+    mov   x1, #10                     // x1 = array size
+    bl    sort_array                  // Sort and print after every comparison
+    // Print final sorted array
+    ldr   x0, =buffer
+    mov   x1, #10
+    bl    print_array
+    b     _end
+
 sort:
     bl    sort_array                  // Call the sort_array function
     ldr   x0, =buffer                 // Load the address of the buffer into x0
     mov   x1, #10                     // Load the size of the array into x1
     bl    print_array                 // Call the print_array function
-    b     exit
 
-    ldr   x0, =array2                 // Load the address of the array into x0
-    mov   x1, #6                      // Load the size of the array into x1
-    bl    print_array                 // Call the print_array function
-    ldr   x0, =array2                 // Load the address of the array into x0
-    ldr   x1, =buffer                 // Load the address of the buffer into x1
-    mov   x2, #6                      // Load the size of the array into x2
-    bl    copy_array
-    ldr   x0, =buffer
-    mov   x1, #6
-    bl    print_array                 // Call the print_array function
-
-    b     exit
-
-    ldr   x0, =array2                 // Load the address of the array into x0
-    mov   x1, #6                      // Load the size of the array into x1
-    bl    sort_array                  // Call the sort function
-    bl    print_array                 // Call the print_array function
-
-    //bl  sort_array                  // Call the sort function
-    bl    print_array                 // Call the print_array function
-    epilogue
-    ret
-
-exit:
-    mov     x0, #0                    // Set x0 to 0 (exit status)
-    mov     x8, #93                   // Syscall: exit (93)
-    svc     0                         // Make the syscall
-
-// Function to sort the array
-//   x0 = address of the array
-//   x1 = size of the array
-sort_array:
-    prologue
-    mov   x26, #0                     // Initialize loop index i to 0
-    mov   x27, #4
-sort_outer_loop:
-    cmp   x1, #0                      // If i >= size, sorting is done
-    beq   sort_done
-    ldr   w2, [x0, x26]               // Load array[i] into x2
-    ldr   w3, [x0, x27]               // Load array[i+1] into x3
-    cmp   w2, w3                      // Compare array[i] and array[i+1]
-    b.le  sort_no_swap                // If array[i] <= array[i+1], no swap needed
-    mov   w4, w2
-    mov   w2, w3
-	mov   w3, w4
-	str   w2, [x0, x26]
-	str   w3, [x0, x27]
-sort_no_swap:
-	add   x26, x26, #4                // Increment index
-	add   x27, x27, #4                // Increment index
-	sub   x1, x1, #1                  // Decrement size
-    b     sort_outer_loop
-sort_done:
-    epilogue
-    ret
-
-// swap_int: Swap two integers
-//   x0 = address of the first integer
-//   x1 = address of the second integer
-swap_int:
-    prologue
-    ldr   x2, [x19]                   // Load first integer into x2
-    ldr   x3, [x20]                   // Load second integer into x3
-    str   x3, [x19]                   // Store second integer at address of first
-    str   x2, [x20]                   // Store first integer at address of second
-    epilogue
-    ret
+	b     _end
 
 // print_array: Print the integer array
 //   x0 = address of the array
@@ -159,6 +105,62 @@ print_done:
     pop   x4, x5
     pop   x2, x3
     pop   x0, x1
+print_end:
+    epilogue
+    ret
+
+// Function to sort the array
+//   x0 = address of the array
+//   x1 = size of the array
+sort_array:
+    prologue
+    mov   x20, x0                  // x20 = base address of array
+    mov   x21, x1                  // x21 = size (n)
+    mov   x22, #0                  // x22 = i (outer loop index)
+sort_outer_loop:
+    cmp   x22, x21                 // if i >= n, done
+    b.ge  sort_done
+    mov   x23, x22                 // x23 = j (inner loop index)
+    add   x23, x23, #1             // j = i + 1
+sort_inner_loop:
+    cmp   x23, x21                 // if j >= n, end inner loop
+    b.ge  sort_outer_next
+    // Load a[i] and a[j]
+    mov   x24, x22
+    lsl   x24, x24, #2             // offset = i * 4
+    ldr   w25, [x20, x24]          // w25 = a[i]
+    mov   x26, x23
+    lsl   x26, x26, #2             // offset = j * 4
+    ldr   w27, [x20, x26]          // w27 = a[j]
+    // Compare and swap if needed
+    cmp   w27, w25
+    b.ge  sort_print               // if a[j] >= a[i], no swap
+    // swap a[i] and a[j]
+    str   w27, [x20, x24]
+    str   w25, [x20, x26]
+sort_print:
+    // Print array after every comparison (regardless of swap)
+    mov   x0, x20                  // x0 = array address
+    mov   x1, x21                  // x1 = array size
+    bl    print_array
+    add   x23, x23, #1             // j++
+    b     sort_inner_loop
+sort_outer_next:
+    add   x22, x22, #1             // i++
+    b     sort_outer_loop
+sort_done:
+    epilogue
+    ret
+
+// swap_int: Swap two integers
+//   x0 = address of the first integer
+//   x1 = address of the second integer
+swap_int:
+    prologue
+    ldr   x2, [x19]                   // Load first integer into x2
+    ldr   x3, [x20]                   // Load second integer into x3
+    str   x3, [x19]                   // Store second integer at address of first
+    str   x2, [x20]                   // Store first integer at address of second
     epilogue
     ret
 
@@ -207,7 +209,7 @@ print_string:
 //   x1 = address of buffer to store string
 itoa:
     prologue
-    ldr   x1, =buffer                 // x1 = buffer address
+    ldr   x1, =itoa_buf               // x1 = buffer address
     mov   x2, x0                      // x2 = integer value
     mov   x3, x1                      // x3 = preserve starting buffer address
     mov   x4, #0                      // x4 = digit count = 0
@@ -238,9 +240,9 @@ reverse_loop:
     sub   x7, x7, #1                  // Decrement end pointer
     b     reverse_loop
 reverse_done:
-    mov   x14, NULL_TERMINATOR        // Load null terminator
+    mov   x14, NULL                   // Load null terminator
     strb  w14, [x1]                   // Store null terminator at buffer end
-    ldr   x1, =buffer                 // x1 = buffer address
+    ldr   x1, =itoa_buf               // x1 = buffer address
     epilogue
     ret
 
@@ -251,33 +253,13 @@ strlen:
     mov   x0, #0                      // Initialize length counter in x0
 strlen_loop:
     ldrb  w2, [x1, x0]                // Load byte at x1 + x0
-    cmp   w2, NULL_TERMINATOR         // Compare to null terminator
+    cmp   w2, NULL                    // Compare to null terminator
     beq   strlen_done                 // If found, finish
     add   x0, x0, #1                  // Increment length counter
     b     strlen_loop
 strlen_done:
     epilogue
     ret                               // Return with length in x0
-
-// clear_buffer: Function to clear the buffer
-//   x0 = address of the buffer
-//   x1 = size of the buffer
-clear_buffer:
-    prologue
-    push  x0, x1
-    push  x2, x3
-    mov   x2, #0                      // Initialize the value to clear with (0)
-clear_loop:
-    cmp   x1, #0                      // Compare size with 0
-    beq   clear_done                  // If size is 0, we're done
-    strb  w0, [x1], #0                // Store 0 at the buffer address and increment the address
-    sub   x1, x1, #1                  // Decrement the size
-    b     clear_loop                  // Repeat the loop
-clear_done:
-    pop   x2, x3
-    pop   x0, x1
-    epilogue
-    ret
 
 // Function: copy_array
 //   x0 = source address (e.g., address of the array)
@@ -294,7 +276,7 @@ copy_loop:
     str   w3, [x1], #4                // Store the 32-bit word into destination and post-increment x1 by 4
     sub   x2, x2, #1                  // Decrement the count
     cmp   x2, #0                      // Check if all words have been copied
-    bne   copy_loop                   // If not, continue looping
+    b.ne  copy_loop                   // If not, continue looping
 copy_done:
     pop   x2, x3
     pop   x0, x1
@@ -302,12 +284,16 @@ copy_done:
     ret
 
 _end:
+    mov     x0, #0                    // Set x0 to 0 (exit status)
+    mov     x8, #93                   // Syscall: exit (93)
+    svc     0                         // Make the syscall
+
 
 .section .data                                  // Data section for constants
-    hello: .asciz "Hello, World!\n"             // Define a null-terminated string
     array1: .word 5, 4, 3, 2, 1, 9, 8, 7, 6, 0  // The unsorted array
     array2: .word 51, 14, 31, 2, 11, 16         // The unsorted array
 
 .section .bss                     // Uninitialized data section
     .align 3                      // Align to 8-byte boundary
-    buffer: .skip 16              // Reserve 16 bytes for int-to-ASCII conversion
+    buffer: .skip 40              // Reserve 40 bytes for int-to-ASCII conversion (10 ints)
+    itoa_buf: .skip 40            // Reserve 40 bytes for int-to-ASCII conversion (10 ints)

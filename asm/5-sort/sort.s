@@ -149,7 +149,7 @@ print_int:
 //   x1 = address of buffer to store string
 itoa:
     prologue
-    ldr     x1, =buffer             // x1 = buffer address
+    ldr     x1, =buffer         // x1 = buffer address
     mov     x2, x0              // x2 = integer value
     mov     x3, x1              // x3 = preserve starting buffer address
     mov     x4, #0              // x4 = digit count = 0
@@ -235,11 +235,11 @@ clear_buffer:
     prologue
     mov     x2, #0              // Initialize the value to clear with (0)
 clear_loop:
-    cmp     x0, #0                        // Compare size with 0
-    beq     clear_done                    // If size is 0, we're done
-    strb    w2, [x1], #1                 // Store 0 at the buffer address and increment the address
-    sub     x0, x0, #1                    // Decrement the size
-    b       clear_loop                      // Repeat the loop
+    cmp     x0, #0              // Compare size with 0
+    beq     clear_done          // If size is 0, we're done
+    strb    w2, [x1], #1        // Store 0 at the buffer address and increment the address
+    sub     x0, x0, #1          // Decrement the size
+    b       clear_loop          // Repeat the loop
 clear_done:
     epilogue
     ret
@@ -255,8 +255,8 @@ copy_array:
 copy_loop:
     ldr     w3, [x0], #4        // Load a 32-bit word from source
                                 // and post-increment x0 by 4
-	str     w3, [x1], #4        // Store the 32-bit word into destination
-	                            // and post-increment x1 by 4
+    str     w3, [x1], #4        // Store the 32-bit word into destination
+	                        // and post-increment x1 by 4
     sub     x2, x2, #1          // Decrement the count
     cmp     x2, #0              // Check if all words have been copied
     bne     copy_loop           // If not, continue looping
